@@ -535,6 +535,8 @@
 
 // export default Navbarfrist;
 
+
+
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { FiGrid, FiLayers, FiChevronDown, FiMenu, FiX } from "react-icons/fi";
@@ -993,15 +995,16 @@ const Navbarfrist = () => {
             )} */}
           </div>
 
-          <Link
+           <Link
             to='#'
             style={navLinkStyle("/")}
             onClick={closeSidebar}
             className='d-flex align-items-center gap-2'
           >
-            <FiLayers />
-            Today Gross Profit
+            <FiLayers />Today Gross Profit
           </Link>
+
+
 
           {/* Billing */}
           <div className='dropdown mt-2'>
