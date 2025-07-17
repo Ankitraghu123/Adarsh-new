@@ -944,6 +944,7 @@ const GenerateInvoice = () => {
 
             .invoice-page:not(:last-child) .invoice-footer {
               display: none;
+
             }
 
             .invoice-page:not(:last-child) .to-be-continued {
@@ -972,8 +973,9 @@ const GenerateInvoice = () => {
             style={{
               // width: "210mm",
               margin: "auto",
-              padding: "1mm",
+              // padding: "1mm",
               fontFamily: "Courier New monospace",
+
 
               fontSize: "12px",
             }}
@@ -987,7 +989,7 @@ const GenerateInvoice = () => {
                   marginTop: "0px",
                 }}
               >
-                <div className='d-flex  mt-2'>
+                <div className='d-flex   mt-2'>
                   <p style={{ marginBottom: "0px", fontSize: "14px" }}>
                     <strong>GSTIN: 23BJUPR9537F1ZK</strong>
                   </p>
@@ -999,6 +1001,8 @@ const GenerateInvoice = () => {
                       fontSize: "22px",
                       textAlign: "right",
                       margin: "-3px",
+                        fontWeight: "900"
+
                     }}
                   >
                     SAMRIDDHI ENTERPRISES
@@ -1007,7 +1011,7 @@ const GenerateInvoice = () => {
 
                 <p
                   style={{
-                    margin: "0",
+                    margin: "1px",
                     textAlign: "center",
                     fontSize: "13px",
                   }}
@@ -1016,7 +1020,7 @@ const GenerateInvoice = () => {
                 </p>
                 <p
                   style={{
-                    margin: "-3px",
+                    margin: "1px",
                     textAlign: "center",
                     fontSize: "13px",
                   }}
@@ -1105,7 +1109,7 @@ const GenerateInvoice = () => {
                       "Sch%",
                       "Sch Amt",
                       "CD%",
-                      "Amount",
+                      "Amt",
                       "SGST",
                       "CGST",
                       "Total",
@@ -1398,7 +1402,7 @@ const GenerateInvoice = () => {
 
               {pageIndex < billingChunks.length - 1 && (
                 <div
-                  className='invoice-footer '
+                  className='invoice-footer ' id="invoice"
                   style={{
                     display: "flex",
                     padding: "2px",
@@ -1461,6 +1465,7 @@ const GenerateInvoice = () => {
                     marginTop: "-16px",
                     fontSize: "11px",
                     gap: "6px",
+                    // padding:"10px",
                     border: "1px solid black",
                     // borderTop: "0",
                     width: "100%",
@@ -1478,7 +1483,7 @@ const GenerateInvoice = () => {
                     <p style={{ marginBottom: "0" }}>
                       Subject to Bhopal jurisdiction/-
                     </p>
-                    <p className='mb-0'>E.&.O.E</p>
+                    <p className='mb-0'>E.&.O.ES</p>
                   </div>
                   {/* //!SGST */}
                   <div
@@ -1488,7 +1493,9 @@ const GenerateInvoice = () => {
                        paddingBottom:"25px",
 
                       borderLeft: "1px solid black",
-                      paddingLeft: "10px",
+                      paddingLeft: "15px",
+                      // paddingRight: "15px",
+
                       margin: "0",
                     }}
                   >
@@ -1511,6 +1518,7 @@ const GenerateInvoice = () => {
                       style={{
                         borderTop: "1px solid black",
                         paddingLeft: "5px",
+                        // paddingRight: "5px",
                         paddingTop: "8px",
                         marginBottom: "0",
                         borderTopStyle: "dashed",
@@ -1528,7 +1536,7 @@ const GenerateInvoice = () => {
                   </div>
                   <div
                     style={{
-                      width: "32%",
+                      width: "100%",
                       textAlign: "",
                        paddingRight: "5px",
                       borderLeft: "1px solid black",
@@ -1540,7 +1548,7 @@ const GenerateInvoice = () => {
                     <h5
                       style={{
                         width: "100%",
-                        fontSize: "14px",
+                        fontSize: "12px",
                         fontWeight: "bold",
                         display: "flex",
                         justifyContent: "space-between",
@@ -1551,6 +1559,7 @@ const GenerateInvoice = () => {
                       <span
                         style={{
                           textAlign: "right",
+                        fontSize: "15px",
                         }}
                       >
                         {invoice.finalAmount?.toFixed(2)}

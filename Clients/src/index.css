@@ -17,10 +17,14 @@ body {
   padding-bottom: 0 !important;
   margin-top: 0 !important;
   margin-bottom: 0 !important;
+    font-weight: 900;
+
+
 }
 
 .invoice-page table {
   text-transform: uppercase;
+  font-weight: 900;
 }
 
 .colored {
@@ -49,6 +53,8 @@ body {
 
 #border-table {
   border: transparent !important;
+  /* background-color: red !important; */
+  font-size: 14px !important;
 
   /* border-left:1px solid black ;
 border-right: 1px solid black; */
