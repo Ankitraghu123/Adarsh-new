@@ -6,13 +6,6 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const path = require("path");
 
-app.use(
-  cors({
-    origin: ["https://adarsh-new.vercel.app", "http://localhost:5173"],
-    methods: ["GET", "POST", "PUT", "DELETE"], // allowed methods
-    credentials: true, // if you're using cookies/auth headers
-  })
-);
 // ---------Routes----------
 // const adminRoute = require("./Routes/adminRoute");
 // const FirmRoute = require("./Routes/FirmRoute");
@@ -25,6 +18,16 @@ const BillingRoute = require("./Routes/ProductBillingRoute");
 const VendorRoute = require("./Routes/VendorRoute");
 const PurchaseRoute = require("./Routes/PurchaseRoute");
 const customerRoutes = require("./Routes/CustomerRoute");
+
+app.use(
+  cors({
+    origin: ["https://adarsh-new.vercel.app", "http://localhost:5173"],
+    methods: ["GET", "POST", "PUT", "DELETE"], // allowed methods
+    credentials: true, // if you're using cookies/auth headers
+  })
+);
+
+app.options("*", cors());
 
 // ---------------------------------------------------------------------
 app.use(bodyParser.json());
@@ -54,13 +57,17 @@ app.use("/api/pro-billing", BillingRoute);
 app.use("/api/vendor", VendorRoute);
 app.use("/api/purchase", PurchaseRoute);
 
-const port = process.env.PORT;
-
 // -----------------------
 // 🔴 Global Error Handling
 // -----------------------
 
 // 404 Not Found
+
+app.use((req, res, next) => {
+  const error = new Error("🔍 Resource not found");
+  error.status = 404;
+  next(error);
+});
 
 // Global Error Handler
 app.use((err, req, res, next) => {
@@ -72,11 +79,7 @@ app.use((err, req, res, next) => {
   });
 });
 
-app.use((req, res, next) => {
-  const error = new Error("🔍 Resource not found");
-  error.status = 404;
-  next(error);
-});
+const port = process.env.PORT;
 
 app.listen(port, () => {
   console.log(`Server Run on ${port} Port`);
