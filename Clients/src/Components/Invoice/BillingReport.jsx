@@ -77,7 +77,7 @@ function BillingReport() {
 
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (e.ctrlKey && e.key === "q") {
+      if (e.key === "F10") {
         e.preventDefault();
         handleSubmit();
       }
@@ -115,7 +115,7 @@ function BillingReport() {
           textAlign: "center",
         }}
       >
-        Press <strong>Ctrl + Q</strong> to submit
+        Press <kbd>F10</kbd> to submit
       </div>
       <div className='text-center mt-4'>
         <button

@@ -34,6 +34,59 @@ const ProductBillingReport = ({ onBillingDataChange }, ref) => {
   const [products, setProducts] = useState([]);
   const [finalTotalAmount, setFinalTotalAmount] = useState("0.00");
 
+  const [showSchemeModal, setShowSchemeModal] = useState(false);
+  const [schemeValue, setSchemeValue] = useState("");
+
+  const [showCDModal, setShowCDModal] = useState(false);
+  const [cdValue, setCDValue] = useState("");
+
+  const schemeInputRef = useRef(null);
+  const cdInputRef = useRef(null);
+
+  useEffect(() => {
+    if (showSchemeModal && schemeInputRef.current) {
+      schemeInputRef.current.focus();
+    }
+  }, [showSchemeModal]);
+
+  useEffect(() => {
+    if (showCDModal && cdInputRef.current) {
+      cdInputRef.current.focus();
+    }
+  }, [showCDModal]);
+
+  useEffect(() => {
+    const handleEsc = (e) => {
+      if (e.key === "Escape") {
+        setShowSchemeModal(false);
+      }
+    };
+
+    if (showSchemeModal) {
+      window.addEventListener("keydown", handleEsc);
+    }
+
+    return () => {
+      window.removeEventListener("keydown", handleEsc);
+    };
+  }, [showSchemeModal]);
+
+  useEffect(() => {
+    const handleEsc = (e) => {
+      if (e.key === "Escape") {
+        setShowCDModal(false);
+      }
+    };
+
+    if (showCDModal) {
+      window.addEventListener("keydown", handleEsc);
+    }
+
+    return () => {
+      window.removeEventListener("keydown", handleEsc);
+    };
+  }, [showCDModal]);
+
   // !
   const [showModal, setShowModal] = useState(false);
   const [selectedRowIndex, setSelectedRowIndex] = useState(null);
@@ -118,7 +171,6 @@ const ProductBillingReport = ({ onBillingDataChange }, ref) => {
   }, [showModal]);
 
   // !
-
   useImperativeHandle(ref, () => ({
     focusItemName: () => {
       console.log("Focusing ItemName input...");
@@ -302,8 +354,32 @@ const ProductBillingReport = ({ onBillingDataChange }, ref) => {
 
   const handleKeyDown = (e, rowIndex) => {
     const isEnter = e.key === "Enter";
-    const isAltN = e.altKey && e.key === "n";
+    const isAltN = e.key === "F2";
     const isEscape = e.key === "Escape";
+
+    if (e.key === "F7") {
+      e.preventDefault();
+      setShowSchemeModal(true);
+      return;
+    }
+
+    if (e.key === "F8") {
+      e.preventDefault();
+      setShowCDModal(true);
+      return;
+    }
+
+    if (e.key === "F4") {
+      e.preventDefault();
+
+      const selectInstance = selectRefs.current[rowIndex];
+      if (selectInstance) {
+        selectInstance.focus(); // ✅ ✅ ✅ बस यही सही है!
+      } else {
+        console.warn("❌ No Select instance found for row:", rowIndex);
+      }
+      return;
+    }
 
     const focusableSelectors =
       "input:not([readonly]), select, .react-select__input input";
@@ -423,7 +499,7 @@ const ProductBillingReport = ({ onBillingDataChange }, ref) => {
     }
 
     // ===== Delete row shortcut =====
-    if (e.key === "Delete" && rows.length > 1) {
+    if ((e.key === "Delete" || e.key === "F3") && rows.length > 1) {
       e.preventDefault();
       const updatedRows = rows.filter((_, i) => i !== rowIndex);
       setRows(updatedRows);
@@ -465,6 +541,100 @@ const ProductBillingReport = ({ onBillingDataChange }, ref) => {
     }
   };
 
+  const applySchemeToAll = () => {
+    const updatedRows = rows.map((row) => {
+      const newRow = { ...row, Sch: schemeValue };
+      return recalculateRow(newRow);
+    });
+
+    setRows(updatedRows);
+
+    const finalTotal = updatedRows
+      .reduce((sum, r) => {
+        const amt = parseFloat(r.Amount);
+        return sum + (isNaN(amt) ? 0 : amt);
+      }, 0)
+      .toFixed(2);
+
+    setFinalTotalAmount(finalTotal);
+
+    const filteredBillingData = updatedRows
+      .filter(
+        (r) =>
+          r.product !== null &&
+          r.Qty !== "" &&
+          !isNaN(parseFloat(r.Qty)) &&
+          parseFloat(r.Qty) > 0
+      )
+      .map((r) => ({
+        productId: r.product._id,
+        itemName: r.product.productName,
+        hsnCode: r.product.hsnCode,
+        unit: r.Unit,
+        qty: parseFloat(r.Qty),
+        Free: parseFloat(r.Free) || 0,
+        rate: parseFloat(r.Basic), // Basic rate without GST
+        sch: parseFloat(r.Sch) || 0,
+        schAmt: parseFloat(r.SchAmt) || 0,
+        cd: parseFloat(r.CD) || 0,
+        cdAmt: parseFloat(r.CDAmt) || 0,
+        total: parseFloat(r.Total) || 0,
+        gst: parseFloat(r.GST) || 0,
+        amount: parseFloat(r.Amount) || 0,
+      }));
+
+    onBillingDataChange(filteredBillingData, finalTotal);
+
+    setShowSchemeModal(false);
+  };
+
+  const applyCDToAll = () => {
+    const updatedRows = rows.map((row) => {
+      const newRow = { ...row, CD: cdValue };
+      return recalculateRow(newRow);
+    });
+
+    setRows(updatedRows);
+
+    const finalTotal = updatedRows
+      .reduce((sum, r) => {
+        const amt = parseFloat(r.Amount);
+        return sum + (isNaN(amt) ? 0 : amt);
+      }, 0)
+      .toFixed(2);
+
+    setFinalTotalAmount(finalTotal);
+
+    const filteredBillingData = updatedRows
+      .filter(
+        (r) =>
+          r.product !== null &&
+          r.Qty !== "" &&
+          !isNaN(parseFloat(r.Qty)) &&
+          parseFloat(r.Qty) > 0
+      )
+      .map((r) => ({
+        productId: r.product._id,
+        itemName: r.product.productName,
+        hsnCode: r.product.hsnCode,
+        unit: r.Unit,
+        qty: parseFloat(r.Qty),
+        Free: parseFloat(r.Free) || 0,
+        rate: parseFloat(r.Basic), // Basic rate without GST
+        sch: parseFloat(r.Sch) || 0,
+        schAmt: parseFloat(r.SchAmt) || 0,
+        cd: parseFloat(r.CD) || 0,
+        cdAmt: parseFloat(r.CDAmt) || 0,
+        total: parseFloat(r.Total) || 0,
+        gst: parseFloat(r.GST) || 0,
+        amount: parseFloat(r.Amount) || 0,
+      }));
+
+    onBillingDataChange(filteredBillingData, finalTotal);
+
+    setShowCDModal(false);
+  };
+
   //!
   const getVirtualStockMap = () => {
     // Create a map of productId -> totalQtyInRows
@@ -504,13 +674,13 @@ const ProductBillingReport = ({ onBillingDataChange }, ref) => {
           <strong>Shortcuts:</strong>
           <div className='d-flex align-items-center gap-3'>
             <span>
-              <strong>New Line:</strong> Enter
+              <strong>New Line:</strong> Enter / F2
             </span>
             <span>
               <strong>Save Row:</strong> Enter
             </span>
             <span>
-              <strong>Delete Row:</strong> Delete
+              <strong>Delete Row:</strong> Delete / F3
             </span>
           </div>
         </div>
@@ -561,7 +731,7 @@ const ProductBillingReport = ({ onBillingDataChange }, ref) => {
                               if (rowIndex === 0) selectRef.current = ref; // optional
                             }
                           }}
-                          className='w-100'
+                          className='w-100 '
                           // isDisabled
 
                           value={
@@ -576,7 +746,8 @@ const ProductBillingReport = ({ onBillingDataChange }, ref) => {
                           styles={{
                             container: (base) => ({
                               ...base,
-                              minWidth: "200px",
+                              minWidth: "350px",
+                              textAlign: "left",
                             }),
                           }}
                         />
@@ -771,10 +942,16 @@ const ProductBillingReport = ({ onBillingDataChange }, ref) => {
             <table className='table table-bordered table-hover'>
               <thead className='table-light'>
                 <tr>
+                  <th>SR</th>
+                  <th>Product Image</th>
                   <th>Product Name</th>
-                  <th>HSN Code</th>
                   <th>Stock</th>
-                  <th>Rate</th>
+                  <th>Brand</th>
+                  <th>HSN Code</th>
+                  <th>MRP</th>
+                  <th>Sales Rate</th>
+                  <th>Purchase Rate</th>
+                  <th>GST %</th>
                 </tr>
               </thead>
               <tbody>
@@ -784,15 +961,138 @@ const ProductBillingReport = ({ onBillingDataChange }, ref) => {
                     ref={(el) => (rowRefs.current[index] = el)}
                     className={index === focusedIndex ? "table-active" : ""}
                   >
-                    <td>{product.productName}</td>
-                    <td>{product.hsnCode}</td>
-                    {/* <td>{product.availableQty}</td> */}
+                    <td>{index + 1}</td>
+                    <td>
+                      {product.productImg ? (
+                        <img
+                          src={`${IMAGE_BASE}/Images/${product.productImg}`}
+                          alt='Product'
+                          width={40}
+                          height={40}
+                          style={{ borderRadius: "50%" }}
+                        />
+                      ) : (
+                        "No Photo"
+                      )}
+                    </td>
+                    <td style={{ textAlign: "left" }}>{product.productName}</td>
                     <td>{virtualStockMap[product._id]}</td>
+                    <td>{product.companyId?.name || "-"}</td>
+                    <td>{product.hsnCode}</td>
+                    <td>{product.mrp}</td>
                     <td>{product.salesRate}</td>
+                    <td>{product.purchaseRate}</td>
+                    <td>{product.gstPercent}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
+          </div>
+        </div>
+      )}
+
+      {showSchemeModal && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100vw",
+            height: "100vh",
+            backgroundColor: "rgba(0,0,0,0.5)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 9999,
+          }}
+          onClick={() => setShowSchemeModal(false)}
+        >
+          <div
+            style={{
+              background: "#fff",
+              padding: "2rem",
+              width: "400px",
+              borderRadius: "8px",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h5>Apply Scheme for All Items</h5>
+            <input
+              type='number'
+              className='form-control mb-3'
+              placeholder='Enter Scheme %'
+              ref={schemeInputRef}
+              value={schemeValue}
+              onChange={(e) => {
+                const val = e.target.value;
+                if (!/^\d*\.?\d*$/.test(val)) return; // only numbers & dot
+                setSchemeValue(val);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  applySchemeToAll();
+                }
+              }}
+            />
+
+            <button
+              className='btn btn-primary'
+              onClick={() => {
+                applySchemeToAll();
+              }}
+            >
+              Apply
+            </button>
+          </div>
+        </div>
+      )}
+
+      {showCDModal && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100vw",
+            height: "100vh",
+            backgroundColor: "rgba(0,0,0,0.5)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 9999,
+          }}
+          onClick={() => setShowCDModal(false)}
+        >
+          <div
+            style={{
+              background: "#fff",
+              padding: "2rem",
+              width: "400px",
+              borderRadius: "8px",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h5>Apply Cash Discount (CD) for All Items</h5>
+            <input
+              type='number'
+              className='form-control mb-3'
+              placeholder='Enter CD %'
+              ref={cdInputRef}
+              value={cdValue}
+              onChange={(e) => {
+                const val = e.target.value;
+                if (!/^\d*\.?\d*$/.test(val)) return;
+                setCDValue(val);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  applyCDToAll();
+                }
+              }}
+            />
+            <button className='btn btn-primary' onClick={applyCDToAll}>
+              Apply
+            </button>
           </div>
         </div>
       )}

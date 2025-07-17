@@ -128,7 +128,7 @@ const VendorReport = () => {
       prev();
     }
 
-    if (e.ctrlKey && e.key === "q") {
+    if (e.key === "F10") {
       e.preventDefault();
       handleSubmit(e);
     }
