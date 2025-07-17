@@ -666,10 +666,17 @@ const ProductBillingReport = ({ onBillingDataChange }, ref) => {
         transform: "translateX(-50%)",
       }}
     >
-      <h2 className='text-center mb-4'>Product Invoice</h2>
+
+<h2 className='text-center mb-4'>Product Invoice</h2>
+
+
 
       <div className='mt-3 p-3 bg-light border rounded'>
-        <h5>Total Items: {rows.length}</h5>
+<div className="d-flex  gap-5 w-100">
+ <h5>Total Items: {rows.length}</h5>
+
+</div>
+
         <div className='d-flex align-items-center gap-4 text-muted mb-0'>
           <strong>Shortcuts:</strong>
           <div className='d-flex align-items-center gap-3'>
@@ -682,6 +689,8 @@ const ProductBillingReport = ({ onBillingDataChange }, ref) => {
             <span>
               <strong>Delete Row:</strong> Delete / F3
             </span>
+
+
           </div>
         </div>
       </div>
@@ -862,13 +871,20 @@ const ProductBillingReport = ({ onBillingDataChange }, ref) => {
               </tr>
             ))}
 
-            <tr style={{ fontWeight: "bold", backgroundColor: "#f8f9fa" }}>
-              <td colSpan={fields.length - 1} className='text-start'>
+
+          </tbody>
+          <tfoot style={{ position:"relative", marginLeft:"50px", height:"10vh" }}>
+              <tr style={{ fontWeight: "bold", position:"fixed", width:"60%", textAlign:"center", backgroundColor: "#f8f9fa" }}>
+              <td style={{ width:"100%" }} colSpan={fields.length - 1} className='text-start'>
                 Final Amount: ₹ <span>{finalTotalAmount}</span>
               </td>
             </tr>
-          </tbody>
+          </tfoot>
         </table>
+        <div>
+
+        </div>
+
       </div>
       {/*//! select option model item name model */}
 

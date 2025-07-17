@@ -1058,7 +1058,7 @@ const GenerateInvoice = () => {
                 <div
                   style={{
                     textAlign: "left",
-                    width: "30%",
+                    width: "35%",
                     display: "flex",
                     flexDirection: "column",
                     gap: "2px",
@@ -1079,9 +1079,9 @@ const GenerateInvoice = () => {
                     &nbsp; {invoice?.billingType}
                   </span>
 
-                  <span>
+                  <span className="d-flex align-items-center gap-2">
                     <strong>Salesman:</strong>
-                    &nbsp; {salesmanId?.name || "N/A"} &nbsp;
+                 <span> {salesmanId?.name || "N/A"} </span>  <strong> M.No. </strong>
                     {salesmanId?.mobile || "-"}
                   </span>
                 </div>
@@ -1456,17 +1456,18 @@ const GenerateInvoice = () => {
                   className='invoice-footer '
                   style={{
                     display: "flex",
-                    padding: "5px",
+                    // padding: "25px",
                     paddingBottom: "0",
                     marginTop: "-16px",
                     fontSize: "11px",
                     gap: "6px",
                     border: "1px solid black",
-                    borderTop: "0",
+                    // borderTop: "0",
                     width: "100%",
                   }}
                 >
-                  <div>
+                  <div style={{ paddingTop:"25px",
+                       paddingBottom:"25px",  paddingLeft: "10px", }}>
                     <p style={{ marginBottom: "0", whiteSpace: "nowrap" }}>
                       Goods once sold will not be taken back
                     </p>
@@ -1481,8 +1482,11 @@ const GenerateInvoice = () => {
                   </div>
                   {/* //!SGST */}
                   <div
-                    className=''
+
                     style={{
+                       paddingTop:"25px",
+                       paddingBottom:"25px",
+
                       borderLeft: "1px solid black",
                       paddingLeft: "10px",
                       margin: "0",
@@ -1526,6 +1530,7 @@ const GenerateInvoice = () => {
                     style={{
                       width: "32%",
                       textAlign: "",
+                       paddingRight: "5px",
                       borderLeft: "1px solid black",
                       paddingLeft: "6px",
                       fontSize: "13px",
