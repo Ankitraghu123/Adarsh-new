@@ -15,7 +15,7 @@ const CustomerBilling = ({ onDataChange, resetTrigger, onNextFocus }) => {
   const [formData, setFormData] = useState({
     Billdate: getCurrentDate(),
     paymentMode: "",
-    billingType: "",
+    billingType: "Credit",
     selectedSalesmanId: null,
     selectedBeatId: null,
     selectedCustomerId: null,
@@ -37,6 +37,15 @@ const CustomerBilling = ({ onDataChange, resetTrigger, onNextFocus }) => {
 
   const billDateRef = useRef(null);
   const beatSelectRef = useRef(null);
+
+  const salesmanSelectRef = useRef(null);
+
+  useEffect(() => {
+    setShowSalesmanModal(true);
+    setTimeout(() => {
+      salesmanInputRef.current?.focus();
+    }, 100);
+  }, []);
 
   // Reset form when resetTrigger changes
   useEffect(() => {
@@ -149,16 +158,6 @@ const CustomerBilling = ({ onDataChange, resetTrigger, onNextFocus }) => {
       selectedCustomerId: null,
     }));
   }, [selectedBeat, allCustomers]);
-
-  // When customer is selected
-  const handleCustomerSelectChange = (option) => {
-    const customer = option?.customerObject || null;
-    setSelectedCustomer(customer);
-    setFormData((prev) => ({
-      ...prev,
-      selectedCustomerId: customer?._id || null,
-    }));
-  };
 
   // Handle input change
   const handleInputChange = (e) => {
@@ -375,7 +374,7 @@ const CustomerBilling = ({ onDataChange, resetTrigger, onNextFocus }) => {
               onKeyDown={handleKeyDown}
               required
             >
-              <option value=''>-- Select --</option>
+              {/* <option value=''>-- Select --</option> */}
               <option value='Credit'>Credit</option>
               <option value='Cash'>Cash</option>
             </select>
