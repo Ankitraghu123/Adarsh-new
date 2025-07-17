@@ -973,7 +973,7 @@ const GenerateInvoice = () => {
             style={{
               // width: "210mm",
               margin: "auto",
-              // padding: "1mm",
+              // padding: "1mmmm",
               fontFamily: "Courier New monospace",
 
 
