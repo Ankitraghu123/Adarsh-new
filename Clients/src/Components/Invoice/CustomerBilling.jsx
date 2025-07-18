@@ -51,6 +51,7 @@ const CustomerBilling = ({ onDataChange, resetTrigger, onNextFocus }) => {
   useEffect(() => {
     setFormData({
       Billdate: getCurrentDate(),
+      billingType: "Credit", // ✅ Fix: include it here too
       paymentMode: "",
       selectedSalesmanId: null,
       selectedBeatId: null,
@@ -375,7 +376,9 @@ const CustomerBilling = ({ onDataChange, resetTrigger, onNextFocus }) => {
               required
             >
               {/* <option value=''>-- Select --</option> */}
-              <option value='Credit'>Credit</option>
+              <option value='Credit' selected>
+                Credit
+              </option>
               <option value='Cash'>Cash</option>
             </select>
           </div>
