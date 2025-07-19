@@ -1,11 +1,26 @@
 /* Main Container */
+
+
 body {
   background-color: #f5f5f5 !important;
   margin: 0;
   padding: 0;
-  overflow: hidden;
-
+  /* overflow: hidden; */
   overflow-x: hidden;
+}
+
+.liness{
+  height: 10px;
+  width: 2px ;
+  background-color: black;
+
+}
+
+.line-main{
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 
