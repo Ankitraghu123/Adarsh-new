@@ -1,3 +1,4 @@
+
 // import React, { useEffect, useState } from "react";
 // import { Table } from "react-bootstrap";
 // import { useParams } from "react-router-dom";
@@ -111,20 +112,15 @@
 //     return acc;
 //   }, {});
 
+
+
+
+
 //   if (loading) return <Loader />;
 
 //   return (
 //     <div>
 //       <div className='container  d-print-none'>
-//         {/* <select
-//           value={printOrientation}
-//           onChange={(e) => setPrintOrientation(e.target.value)}
-//           className='form-select mb-3'
-//         >
-//           <option value='portrait'>Portrait</option>
-//           <option value='landscape'>Landscape</option>
-//         </select> */}
-
 //         <button
 //           onClick={() => window.print()}
 //           className='btn btn-primary my-3 d-print-none'
@@ -152,6 +148,10 @@
 //               width: 100%;
 //             }
 
+//             p{
+//             margin:0 ;
+//             }
+
 //             .d-print-none {
 //               display: none !important;
 //             }
@@ -167,6 +167,7 @@
 
 //             .invoice-page:not(:last-child) .invoice-footer {
 //               display: none;
+
 //             }
 
 //             .invoice-page:not(:last-child) .to-be-continued {
@@ -183,7 +184,7 @@
 //         `}
 //       </style>
 
-//       <div id='print-area'>
+//       <div id='print-area' style={{ lineHeight: "1" }}>
 //         {billingChunks.map((chunk, pageIndex) => (
 //           <div
 //             key={pageIndex}
@@ -191,7 +192,7 @@
 //             style={{
 //               // width: "210mm",
 //               margin: "auto",
-//               padding: "1mm",
+//               // padding: "1mmmm",
 //               fontFamily: "Courier New monospace",
 
 //               fontSize: "12px",
@@ -206,24 +207,29 @@
 //                   marginTop: "0px",
 //                 }}
 //               >
-//                 <p style={{ margin: "0 0 5px 0", fontSize: "14px" }}>
-//                   <strong>GSTIN: 23BJUPR9537F1ZK</strong>
-//                 </p>
+//                 <div className='d-flex   mt-2'>
+//                   <p style={{ marginBottom: "0px", fontSize: "14px" }}>
+//                     <strong>GSTIN: 23BJUPR9537F1ZK</strong>
+//                   </p>
 
-//                 <h2
-//                   style={{
-//                     //fontWeight: "bold",
-//                     fontSize: "22px",
-//                     textAlign: "center",
-//                     margin: "-3px",
-//                   }}
-//                 >
-//                   SAMRIDDHI ENTERPRISES
-//                 </h2>
+//                   <h2
+//                     style={{
+//                       width: "45%",
+//                       //fontWeight: "bold",
+//                       fontSize: "22px",
+//                       textAlign: "right",
+//                       margin: "-3px",
+//                         fontWeight: "900"
+
+//                     }}
+//                   >
+//                     SAMRIDDHI ENTERPRISES
+//                   </h2>
+//                 </div>
 
 //                 <p
 //                   style={{
-//                     margin: "0",
+//                     margin: "1px",
 //                     textAlign: "center",
 //                     fontSize: "13px",
 //                   }}
@@ -232,7 +238,7 @@
 //                 </p>
 //                 <p
 //                   style={{
-//                     margin: "-3px",
+//                     margin: "1px",
 //                     textAlign: "center",
 //                     fontSize: "13px",
 //                   }}
@@ -274,7 +280,7 @@
 //                 <div
 //                   style={{
 //                     textAlign: "left",
-//                     width: "25%",
+//                     width: "35%",
 //                     display: "flex",
 //                     flexDirection: "column",
 //                     gap: "2px",
@@ -295,9 +301,9 @@
 //                     &nbsp; {invoice?.billingType}
 //                   </span>
 
-//                   <span>
+//                   <span className="d-flex align-items-center gap-2">
 //                     <strong>Salesman:</strong>
-//                     &nbsp; {salesmanId?.name || "N/A"} &nbsp;
+//                  <span> {salesmanId?.name || "N/A"} </span>  <strong> M.No. </strong>
 //                     {salesmanId?.mobile || "-"}
 //                   </span>
 //                 </div>
@@ -306,7 +312,7 @@
 //               <Table
 //                 bordered
 //                 className='mt-1 table-sm'
-//                 style={{ border: "1px solid #000", fontSize: "12px" }}
+//                 style={{ fontSize: "12px", borderBottom: "none" }}
 //               >
 //                 <thead>
 //                   <tr>
@@ -321,7 +327,7 @@
 //                       "Sch%",
 //                       "Sch Amt",
 //                       "CD%",
-//                       "Amount",
+//                       "Amt",
 //                       "SGST",
 //                       "CGST",
 //                       "Total",
@@ -342,12 +348,16 @@
 //                     ))}
 //                   </tr>
 //                 </thead>
-//                 <tbody>
+//                 <tbody style={{ borderBottom: "none !important" }}>
 //                   {chunk.map((item, index) => {
 //                     const product = productDetails[item.productId?._id] || {};
 //                     const gst = product?.gstPercent || 0;
 //                     return (
-//                       <tr id="border-table" style={{ border:"none" }} key={index}>
+//                       <tr
+//                         id='border-table'
+//                         style={{ border: "none", background: "red" }}
+//                         key={index}
+//                       >
 //                         <td
 //                           style={{
 //                             borderLeft: "1px solid black",
@@ -364,6 +374,7 @@
 //                             textAlign: "left",
 //                             paddingLeft: "5px",
 //                             paddingRight: "5px",
+//                             whiteSpace: "nowrap",
 //                           }}
 //                         >
 //                           {item.itemName || "N/A"}
@@ -382,6 +393,7 @@
 //                             borderRight: "1px solid black",
 //                             textAlign: "right",
 //                             padding: "2px",
+//                             whiteSpace: "nowrap",
 //                           }}
 //                         >
 //                           {product.mrp || 0}
@@ -391,6 +403,7 @@
 //                             borderRight: "1px solid black",
 //                             textAlign: "right",
 //                             padding: "2px",
+//                             whiteSpace: "nowrap",
 //                           }}
 //                         >
 //                           {item.qty || 0}
@@ -481,7 +494,7 @@
 //                   })}
 
 //                   {chunk.length > 0 && (
-//                     <tr style={{ borderBottom: "1px solid black" }}>
+//                     <tr style={{}}>
 //                       <td
 //                         colSpan={14}
 //                         style={{ height: "1px", padding: 0 }}
@@ -489,25 +502,26 @@
 //                     </tr>
 //                   )}
 
-//                     {chunk.length < itemsPerPage &&
-//   Array.from({ length: itemsPerPage - chunk.length }).map((_, i) => (
-//     <tr key={`empty-${i}`}>
-//       {Array.from({ length: 14 }).map((_, j) => (
-//         <td
-//           key={j}
-//           style={{
-//             borderRight: "1px solid black",
-//             borderLeft: j === 0 ? "1px solid black" : undefined,
-//             textAlign: "center",
-//             padding: "2px",
-//             height: "22px", // Consistent height
-//           }}
-//         >
-
-//         </td>
-//       ))}
-//     </tr>
-//   ))}
+//                   {chunk.length < itemsPerPage &&
+//                     Array.from({ length: itemsPerPage - chunk.length }).map(
+//                       (_, i) => (
+//                         <tr key={`empty-${i}`}>
+//                           {Array.from({ length: 14 }).map((_, j) => (
+//                             <td
+//                               key={j}
+//                               style={{
+//                                 borderRight: "1px solid black",
+//                                 borderLeft:
+//                                   j === 0 ? "1px solid black" : undefined,
+//                                 textAlign: "center",
+//                                 padding: "2px",
+//                                 height: "22px", // Consistent height
+//                               }}
+//                             ></td>
+//                           ))}
+//                         </tr>
+//                       )
+//                     )}
 
 //                   {pageIndex === billingChunks.length - 1 && (
 //                     <tr style={{ fontWeight: "bold" }}>
@@ -525,9 +539,10 @@
 //                         QTY:{" "}
 //                       </td>
 //                       <td
-//                         className='p-1'
+//                         className='p-1 '
 //                         style={{
-//                           borderBottom: "1px solid black",
+//                           whiteSpace: "nowrap",
+//                           borderBottom: " 1px solid black",
 //                           borderTop: "1px solid black",
 //                         }}
 //                       >
@@ -540,9 +555,10 @@
 //                           borderRight: "1px solid black",
 //                           borderTop: "1px solid black",
 //                           textAlign: "center",
+//                           whiteSpace: "nowrap",
 //                         }}
 //                       >
-//                         PCS : {totals.totalQty || 0}
+//                         PCS:{totals.totalQty || 0}
 //                       </td>
 //                       <td
 //                         style={{ textAlign: "right" }}
@@ -602,12 +618,15 @@
 //                 </tbody>
 //               </Table>
 
+
+
+
 //               {pageIndex < billingChunks.length - 1 && (
 //                 <div
-//                   className='invoice-footer '
+//                   className='invoice-footer ' id="invoice"
 //                   style={{
 //                     display: "flex",
-//                     padding: "5px",
+//                     padding: "2px",
 //                     paddingBottom: "0",
 //                     marginTop: "-16px",
 //                     fontSize: "11px",
@@ -615,10 +634,11 @@
 //                     border: "1px solid black",
 //                     borderTop: "0",
 //                     width: "100%",
+//                     whiteSpace: "nowrap",
 //                   }}
 //                 >
 //                   <div>
-//                     <p style={{ marginBottom: "0" }}>
+//                     <p style={{ marginBottom: "0", whiteSpace: "nowrap" }}>
 //                       Goods once sold will not be taken back
 //                     </p>
 //                     <p style={{ marginBottom: "0" }}>
@@ -661,18 +681,20 @@
 //                   className='invoice-footer '
 //                   style={{
 //                     display: "flex",
-//                     padding: "5px",
+//                     // padding: "25px",
 //                     paddingBottom: "0",
 //                     marginTop: "-16px",
 //                     fontSize: "11px",
 //                     gap: "6px",
+//                     // padding:"10px",
 //                     border: "1px solid black",
-//                     borderTop: "0",
+//                     // borderTop: "0",
 //                     width: "100%",
 //                   }}
 //                 >
-//                   <div>
-//                     <p style={{ marginBottom: "0" }}>
+//                   <div style={{ paddingTop:"25px",
+//                        paddingBottom:"25px",  paddingLeft: "10px", }}>
+//                     <p style={{ marginBottom: "0", whiteSpace: "nowrap" }}>
 //                       Goods once sold will not be taken back
 //                     </p>
 //                     <p style={{ marginBottom: "0" }}>
@@ -682,19 +704,31 @@
 //                     <p style={{ marginBottom: "0" }}>
 //                       Subject to Bhopal jurisdiction/-
 //                     </p>
-//                     <p>E.&.O.E</p>
+//                     <p className='mb-0'>E.&.O.ES</p>
 //                   </div>
 //                   {/* //!SGST */}
 //                   <div
-//                     className=''
+
 //                     style={{
+//                        paddingTop:"25px",
+//                        paddingBottom:"25px",
+
 //                       borderLeft: "1px solid black",
-//                       paddingLeft: "10px",
+//                       paddingLeft: "15px",
+//                       // paddingRight: "15px",
+
 //                       margin: "0",
 //                     }}
 //                   >
 //                     {Object.entries(gstSummary).map(([rate, value]) => (
-//                       <p style={{ margin: "0", padding: "2px" }} key={rate}>
+//                       <p
+//                         style={{
+//                           margin: "0",
+//                           padding: "2px",
+//                           whiteSpace: "nowrap",
+//                         }}
+//                         key={rate}
+//                       >
 //                         {rate}%: SGST {value.sgst.toFixed(2)}, CGST{" "}
 //                         {value.cgst.toFixed(2)} ={" "}
 //                         {(value.sgst + value.cgst).toFixed(2)} /{" "}
@@ -705,7 +739,9 @@
 //                       style={{
 //                         borderTop: "1px solid black",
 //                         paddingLeft: "5px",
+//                         // paddingRight: "5px",
 //                         paddingTop: "8px",
+//                         marginBottom: "0",
 //                         borderTopStyle: "dashed",
 //                       }}
 //                     >
@@ -721,8 +757,9 @@
 //                   </div>
 //                   <div
 //                     style={{
-//                       width: "32%",
+//                       width: "100%",
 //                       textAlign: "",
+//                        paddingRight: "5px",
 //                       borderLeft: "1px solid black",
 //                       paddingLeft: "6px",
 //                       fontSize: "13px",
@@ -732,7 +769,7 @@
 //                     <h5
 //                       style={{
 //                         width: "100%",
-//                         fontSize: "14px",
+//                         fontSize: "12px",
 //                         fontWeight: "bold",
 //                         display: "flex",
 //                         justifyContent: "space-between",
@@ -743,6 +780,7 @@
 //                       <span
 //                         style={{
 //                           textAlign: "right",
+//                         fontSize: "15px",
 //                         }}
 //                       >
 //                         {invoice.finalAmount?.toFixed(2)}
@@ -771,133 +809,182 @@
 
 // export default GenerateInvoice;
 
-import React, { useEffect, useState } from "react";
+
+
+
+
+
+
+
+
+
+
+
+import React, { useEffect, useState, useMemo, useCallback } from "react";
 import { Table } from "react-bootstrap";
 import { useParams } from "react-router-dom";
 import axios from "../../Config/axios";
 import Loader from "../Loader";
-import { toWords } from "number-to-words";
+
+// Constants for better readability
+const ITEMS_PER_PAGE = 14;
+
+// Helper function to format currency values
+const formatCurrency = (value) => {
+  const num = parseFloat(value);
+  return isNaN(num) ? "0.00" : num.toFixed(2);
+};
+
+// Helper function to format GST rates to one decimal place
+const formatGstRate = (value) => {
+  const num = parseFloat(value);
+  return isNaN(num) ? "0.0" : num.toFixed(1);
+};
+
+// Helper function to chunk an array
+const chunkArray = (arr, size) => {
+  const result = [];
+  for (let i = 0; i < arr.length; i += size) {
+    result.push(arr.slice(i, i + size));
+  }
+  return result;
+};
 
 const GenerateInvoice = () => {
   const { id } = useParams();
-  const [invoice, setInvoice] = useState(null);
-  const [error, setError] = useState(null);
+  const [invoiceData, setInvoiceData] = useState(null);
   const [fullCustomer, setFullCustomer] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [productDetails, setProductDetails] = useState({});
+  const [productDetailsMap, setProductDetailsMap] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchInvoice = async () => {
+    const controller = new AbortController();
+    const signal = controller.signal;
+
+    const fetchInvoiceData = async () => {
       setLoading(true);
+      setError(null);
       try {
-        const response = await axios.get(`/pro-billing/${id}`);
-        setInvoice(response.data);
+        const invoiceResponse = await axios.get(`/pro-billing/${id}`, { signal });
+        const invoice = invoiceResponse.data;
+        setInvoiceData(invoice);
 
-        if (response.data.customerId?._id) {
-          const customerResponse = await axios.get(
-            `/customer/${response.data.customerId._id}`
-          );
+        const customerId = invoice.customerId?._id;
+        const billingItems = invoice.billing || [];
 
-          setFullCustomer(customerResponse.data);
+        const promises = [];
+
+        // Fetch customer details
+        if (customerId) {
+          promises.push(axios.get(`/customer/${customerId}`, { signal }));
+        } else {
+          promises.push(Promise.resolve({ data: null })); // Placeholder for customer
         }
 
-        if (response.data.billing?.length > 0) {
-          const uniqueProductIds = [
-            ...new Set(
-              response.data.billing
-                .map((item) => item.productId?._id)
-                .filter((id) => id)
-            ),
-          ];
+        // Fetch unique product details
+        const uniqueProductIds = [
+          ...new Set(
+            billingItems
+              .map((item) => item.productId?._id)
+              .filter(Boolean) // Filter out null/undefined IDs
+          ),
+        ];
 
-          const productResponses = await Promise.all(
-            uniqueProductIds.map((id) => axios.get(`/product/${id}`))
+        if (uniqueProductIds.length > 0) {
+          promises.push(
+            Promise.all(
+              uniqueProductIds.map((productId) =>
+                axios.get(`/product/${productId}`, { signal })
+              )
+            )
           );
+        } else {
+          promises.push(Promise.resolve([])); // Placeholder for products
+        }
 
-          const productMap = {};
-          uniqueProductIds.forEach((id, index) => {
-            productMap[id] = productResponses[index].data;
+        const [customerRes, productResponses] = await Promise.all(promises);
+
+        setFullCustomer(customerRes.data);
+
+        const productMap = {};
+        if (Array.isArray(productResponses)) {
+          productResponses.forEach((res) => {
+            if (res.data) {
+              productMap[res.data._id] = res.data;
+            }
           });
-
-          setProductDetails(productMap);
         }
-      } catch (error) {
-        console.error("Error fetching invoice:", error);
-        setError("Failed to load invoice. Please try again.");
+        setProductDetailsMap(productMap);
+      } catch (err) {
+        if (err.name === 'CanceledError') {
+          console.log('Fetch aborted');
+        } else {
+          console.error("Error fetching invoice:", err);
+          setError("Failed to load invoice. Please try again.");
+        }
       } finally {
         setLoading(false);
       }
     };
 
-    fetchInvoice();
+    fetchInvoiceData();
+
+    return () => {
+      controller.abort(); // Abort ongoing requests on unmount
+    };
   }, [id]);
 
-  if (error) return <p className='text-danger'>{error}</p>;
-  if (loading || !invoice) return <Loader />;
+  // Memoized calculations for totals
+  const totals = useMemo(() => {
+    if (!invoiceData?.billing) return {};
+    return invoiceData.billing.reduce(
+      (acc, item) => {
+        acc.basicAmount += parseFloat(item.taxableAmount) || 0;
+        acc.sgst += parseFloat(item.sgst) || 0;
+        acc.cgst += parseFloat(item.cgst) || 0;
+        acc.total += parseFloat(item.total) || 0;
+        acc.totalQty += parseFloat(item.qty) || 0;
+        acc.totalSchAmt += parseFloat(item.schAmt) || 0;
+        return acc;
+      },
+      { basicAmount: 0, sgst: 0, cgst: 0, total: 0, totalQty: 0, totalSchAmt: 0 }
+    );
+  }, [invoiceData]);
 
-  const calculateTotals = () => {
-    if (!invoice.billing) return {};
-    return invoice.billing.reduce((acc, item) => {
-      acc.basicAmount =
-        (acc.basicAmount || 0) + (parseFloat(item.taxableAmount) || 0);
-      acc.sgst = (acc.sgst || 0) + (parseFloat(item.sgst) || 0);
-      acc.cgst = (acc.cgst || 0) + (parseFloat(item.cgst) || 0);
-      acc.total = (acc.total || 0) + (parseFloat(item.total) || 0);
-      acc.totalQty = (acc.totalQty || 0) + (parseFloat(item.qty) || 0);
+  // Memoized GST summary
+  const gstSummary = useMemo(() => {
+    if (!invoiceData?.billing) return {};
+    return invoiceData.billing.reduce((acc, item) => {
+      const product = productDetailsMap[item.productId?._id] || {};
+      const gst = parseFloat(product?.gstPercent) || 0;
+      const amount = parseFloat(item.total) || 0;
+
+      // Calculate taxable amount by removing GST from total
+      // This assumes item.total already includes GST
+      const taxableAmt = gst > 0 ? (amount * 100) / (100 + gst) : amount;
+
+      if (!acc[gst]) {
+        acc[gst] = { taxable: 0, sgst: 0, cgst: 0 };
+      }
+
+      acc[gst].taxable += taxableAmt;
+      acc[gst].sgst += (taxableAmt * gst) / 2 / 100;
+      acc[gst].cgst += (taxableAmt * gst) / 2 / 100;
+
       return acc;
     }, {});
-  };
+  }, [invoiceData, productDetailsMap]);
 
-  const totals = calculateTotals();
-  const { customer = {}, billing = [], salesmanId = {} } = invoice;
+  const { customer = {}, billing = [], salesmanId = {} } = invoiceData || {};
+  const billingChunks = useMemo(() => chunkArray(billing, ITEMS_PER_PAGE), [billing]);
 
-  const chunkArray = (arr, size) => {
-    const result = [];
-    for (let i = 0; i < arr.length; i += size) {
-      result.push(arr.slice(i, i + size));
-    }
-    return result;
-  };
-
-  const itemsPerPage = 14;
-  const billingChunks = chunkArray(billing, itemsPerPage);
-
-  // Utility to group by GST %
-  const gstSummary = billing.reduce((acc, item) => {
-    const product = productDetails[item.productId?._id] || {};
-    const gst = product?.gstPercent || 0;
-    const amount = parseFloat(item.total) || 0;
-    const taxableAmt = (amount * 100) / (100 + gst); // to remove GST from total
-
-    if (!acc[gst]) {
-      acc[gst] = {
-        taxable: 0,
-        sgst: 0,
-        cgst: 0,
-      };
-    }
-
-    acc[gst].taxable += taxableAmt;
-    acc[gst].sgst += (taxableAmt * gst) / 2 / 100;
-    acc[gst].cgst += (taxableAmt * gst) / 2 / 100;
-
-    return acc;
-  }, {});
-
-  if (loading) return <Loader />;
+  if (error) return <p className='text-danger'>{error}</p>;
+  if (loading || !invoiceData) return <Loader />;
 
   return (
     <div>
-      <div className='container  d-print-none'>
-        {/* <select
-          value={printOrientation}
-          onChange={(e) => setPrintOrientation(e.target.value)}
-          className='form-select mb-3'
-        >
-          <option value='portrait'>Portrait</option>
-          <option value='landscape'>Landscape</option>
-        </select> */}
-
+      <div className='container d-print-none'>
         <button
           onClick={() => window.print()}
           className='btn btn-primary my-3 d-print-none'
@@ -925,8 +1012,8 @@ const GenerateInvoice = () => {
               width: 100%;
             }
 
-            p{
-            margin:0 ;
+            p {
+              margin: 0;
             }
 
             .d-print-none {
@@ -939,12 +1026,11 @@ const GenerateInvoice = () => {
 
             @page {
               size: A4;
-              margin:3mm;
+              margin: 3mm;
             }
 
             .invoice-page:not(:last-child) .invoice-footer {
               display: none;
-
             }
 
             .invoice-page:not(:last-child) .to-be-continued {
@@ -958,10 +1044,6 @@ const GenerateInvoice = () => {
             margin-top: 20px;
             font-weight: bold;
           }
-
-
-
-
         `}
       </style>
 
@@ -971,12 +1053,8 @@ const GenerateInvoice = () => {
             key={pageIndex}
             className='invoice-page'
             style={{
-              // width: "210mm",
               margin: "auto",
-              // padding: "1mmmm",
               fontFamily: "Courier New monospace",
-
-
               fontSize: "12px",
             }}
           >
@@ -989,7 +1067,7 @@ const GenerateInvoice = () => {
                   marginTop: "0px",
                 }}
               >
-                <div className='d-flex   mt-2'>
+                <div className='d-flex mt-2'>
                   <p style={{ marginBottom: "0px", fontSize: "14px" }}>
                     <strong>GSTIN: 23BJUPR9537F1ZK</strong>
                   </p>
@@ -997,12 +1075,10 @@ const GenerateInvoice = () => {
                   <h2
                     style={{
                       width: "45%",
-                      //fontWeight: "bold",
                       fontSize: "22px",
                       textAlign: "right",
                       margin: "-3px",
-                        fontWeight: "900"
-
+                      fontWeight: "900",
                     }}
                   >
                     SAMRIDDHI ENTERPRISES
@@ -1035,7 +1111,6 @@ const GenerateInvoice = () => {
                   margin: 0,
                   padding: 0,
                   fontSize: "12px",
-                  // fontFamily: "monospace",
                   lineHeight: "1.2",
                 }}
               >
@@ -1049,7 +1124,6 @@ const GenerateInvoice = () => {
                   }}
                 >
                   <strong>
-                    {" "}
                     <span>{fullCustomer?.ledger || "N/A"}</span>
                   </strong>
                   <span>{fullCustomer?.address1 || "N/A"}</span>
@@ -1073,19 +1147,20 @@ const GenerateInvoice = () => {
                     <strong>
                       Bill No:
                       <span style={{ fontSize: "17px", fontWeight: "300" }}>
-                        {invoice._id?.slice(-6)}
+                        {invoiceData._id?.slice(-6) || "N/A"}
                       </span>
                     </strong>
                   </span>
                   <span>
                     <strong>Date:</strong>
-                    {new Date(customer?.Billdate).toLocaleDateString("en-GB")}
-                    &nbsp; {invoice?.billingType}
+                    {new Date(customer?.Billdate).toLocaleDateString("en-GB")}{" "}
+                    &nbsp; {invoiceData?.billingType || "N/A"}
                   </span>
 
                   <span className="d-flex align-items-center gap-2">
                     <strong>Salesman:</strong>
-                 <span> {salesmanId?.name || "N/A"} </span>  <strong> M.No. </strong>
+                    <span> {salesmanId?.name || "N/A"} </span>{" "}
+                    <strong> M.No. </strong>
                     {salesmanId?.mobile || "-"}
                   </span>
                 </div>
@@ -1113,15 +1188,15 @@ const GenerateInvoice = () => {
                       "SGST",
                       "CGST",
                       "Total",
-                    ].map((header, i) => (
+                    ].map((header) => (
                       <th
-                        key={i}
+                        key={header}
                         style={{
                           border: "1px solid black",
                           padding: "2px",
                           textAlign: "center",
-                          paddingLeft: i === 1 ? "5px" : "2px",
-                          paddingRight: i === 1 ? "5px" : "2px",
+                          paddingLeft: header === "Item Name" ? "5px" : "2px",
+                          paddingRight: header === "Item Name" ? "5px" : "2px",
                           fontWeight: "400",
                         }}
                       >
@@ -1130,153 +1205,93 @@ const GenerateInvoice = () => {
                     ))}
                   </tr>
                 </thead>
-                <tbody style={{ borderBottom: "none !important" }}>
+                <tbody style={{ borderBottom: "none" }}>
                   {chunk.map((item, index) => {
-                    const product = productDetails[item.productId?._id] || {};
-                    const gst = product?.gstPercent || 0;
+                    const product = productDetailsMap[item.productId?._id] || {};
+                    const gst = parseFloat(product?.gstPercent) || 0;
+
+                    const commonBodyCellStyle = {
+                      borderRight: "1px solid black",
+                      padding: "2px",
+                      textAlign: "right",
+                    };
+
                     return (
                       <tr
-                        id='border-table'
-                        style={{ border: "none", background: "red" }}
-                        key={index}
+                        style={{ border: "none" }}
+                        key={item._id || index}
                       >
                         <td
                           style={{
                             borderLeft: "1px solid black",
-                            borderRight: "1px solid black",
-                            textAlign: "center",
-                            padding: "2px",
+                            ...commonBodyCellStyle,
                           }}
                         >
-                          {pageIndex * itemsPerPage + index + 1}
+                          {pageIndex * ITEMS_PER_PAGE + index + 1}
                         </td>
                         <td
                           style={{
-                            borderRight: "1px solid black",
-                            textAlign: "left",
+                            ...commonBodyCellStyle,
                             paddingLeft: "5px",
                             paddingRight: "5px",
                             whiteSpace: "nowrap",
+                            textAlign: "left",
                           }}
                         >
                           {item.itemName || "N/A"}
                         </td>
-                        <td
-                          style={{
-                            borderRight: "1px solid black",
-                            textAlign: "right",
-                            padding: "2px",
-                          }}
-                        >
+                        <td style={commonBodyCellStyle}>
                           {product.hsnCode || "N/A"}
                         </td>
                         <td
                           style={{
-                            borderRight: "1px solid black",
-                            textAlign: "right",
-                            padding: "2px",
+                            ...commonBodyCellStyle,
                             whiteSpace: "nowrap",
                           }}
                         >
-                          {product.mrp || 0}
+                          {formatCurrency(product.mrp)}
                         </td>
                         <td
                           style={{
-                            borderRight: "1px solid black",
-                            textAlign: "right",
-                            padding: "2px",
+                            ...commonBodyCellStyle,
                             whiteSpace: "nowrap",
                           }}
                         >
                           {item.qty || 0}
                         </td>
-                        <td
-                          style={{
-                            borderRight: "1px solid black",
-                            textAlign: "right",
-                            padding: "2px",
-                          }}
-                        >
+                        <td style={commonBodyCellStyle}>
                           {item.Free || 0}
                         </td>
-                        <td
-                          style={{
-                            borderRight: "1px solid black",
-                            textAlign: "right",
-                            padding: "2px",
-                          }}
-                        >
-                          {item.rate || 0}
+                        <td style={commonBodyCellStyle}>
+                          {formatCurrency(item.rate)}
                         </td>
-                        <td
-                          style={{
-                            borderRight: "1px solid black",
-                            textAlign: "right",
-                            padding: "2px",
-                          }}
-                        >
+                        <td style={commonBodyCellStyle}>
                           {item.sch || 0}
                         </td>
-                        <td
-                          style={{
-                            borderRight: "1px solid black",
-                            textAlign: "right",
-                            padding: "2px",
-                          }}
-                        >
-                          {item.schAmt || 0}
+                        <td style={commonBodyCellStyle}>
+                          {formatCurrency(item.schAmt)}
                         </td>
-                        <td
-                          style={{
-                            borderRight: "1px solid black",
-                            textAlign: "right",
-                            padding: "2px",
-                          }}
-                        >
+                        <td style={commonBodyCellStyle}>
                           {item.cd || 0}
                         </td>
-                        <td
-                          style={{
-                            borderRight: "1px solid black",
-                            textAlign: "right",
-                            padding: "2px",
-                          }}
-                        >
-                          {item.total || 0}
+                        <td style={commonBodyCellStyle}>
+                          {formatCurrency(item.total)}
                         </td>
-                        <td
-                          style={{
-                            borderRight: "1px solid black",
-                            textAlign: "right",
-                            padding: "2px",
-                          }}
-                        >
-                          {gst / 2}
+                        <td style={commonBodyCellStyle}>
+                          {formatGstRate(gst / 2)}
                         </td>
-                        <td
-                          style={{
-                            borderRight: "1px solid black",
-                            textAlign: "right",
-                            padding: "2px",
-                          }}
-                        >
-                          {gst / 2}
+                        <td style={commonBodyCellStyle}>
+                          {formatGstRate(gst / 2)}
                         </td>
-                        <td
-                          style={{
-                            borderRight: "1px solid black",
-                            textAlign: "right",
-                            padding: "2px",
-                          }}
-                        >
-                          {item.amount || 0}
+                        <td style={commonBodyCellStyle}>
+                          {formatCurrency(item.amount)}
                         </td>
                       </tr>
                     );
                   })}
 
                   {chunk.length > 0 && (
-                    <tr style={{}}>
+                    <tr>
                       <td
                         colSpan={14}
                         style={{ height: "1px", padding: 0 }}
@@ -1284,8 +1299,8 @@ const GenerateInvoice = () => {
                     </tr>
                   )}
 
-                  {chunk.length < itemsPerPage &&
-                    Array.from({ length: itemsPerPage - chunk.length }).map(
+                  {chunk.length < ITEMS_PER_PAGE &&
+                    Array.from({ length: ITEMS_PER_PAGE - chunk.length }).map(
                       (_, i) => (
                         <tr key={`empty-${i}`}>
                           {Array.from({ length: 14 }).map((_, j) => (
@@ -1297,7 +1312,7 @@ const GenerateInvoice = () => {
                                   j === 0 ? "1px solid black" : undefined,
                                 textAlign: "center",
                                 padding: "2px",
-                                height: "22px", // Consistent height
+                                height: "22px",
                               }}
                             ></td>
                           ))}
@@ -1307,15 +1322,16 @@ const GenerateInvoice = () => {
 
                   {pageIndex === billingChunks.length - 1 && (
                     <tr style={{ fontWeight: "bold" }}>
-                      <td className='border border-black p-1'></td>
-                      <td className='border border-black p-1' colSpan={1}>
-                        Basic Amount: {totals.total?.toFixed(2) || "0.00"}
+                      <td className='border border-black p-1' style={{ textAlign: "center" }}></td>
+                      <td className='border border-black p-1' style={{ textAlign: "center" }}>
+                        Basic Amount: {formatCurrency(totals.total)}
                       </td>
                       <td
                         className='p-1'
                         style={{
                           borderBottom: "1px solid black",
                           borderTop: "1px solid black",
+                          textAlign: "center",
                         }}
                       >
                         QTY:{" "}
@@ -1326,6 +1342,7 @@ const GenerateInvoice = () => {
                           whiteSpace: "nowrap",
                           borderBottom: " 1px solid black",
                           borderTop: "1px solid black",
+                          textAlign: "center",
                         }}
                       >
                         C/S 0
@@ -1343,57 +1360,52 @@ const GenerateInvoice = () => {
                         PCS:{totals.totalQty || 0}
                       </td>
                       <td
-                        style={{ textAlign: "right" }}
                         className='border border-black p-1'
+                        style={{ textAlign: "center" }}
                       >
                         0
                       </td>
                       <td
-                        style={{ textAlign: "right" }}
                         className='border border-black p-1'
+                        style={{ textAlign: "center" }}
                       ></td>
                       <td
-                        style={{ textAlign: "right" }}
                         className='border border-black p-1'
+                        style={{ textAlign: "center" }}
                       ></td>
                       <td
-                        style={{ textAlign: "right" }}
                         className='border border-black p-1'
+                        style={{ textAlign: "center" }}
                       >
-                        {billing
-                          .reduce(
-                            (sum, item) => sum + (parseFloat(item.schAmt) || 0),
-                            0
-                          )
-                          .toFixed(2)}
+                        {formatCurrency(totals.totalSchAmt)}
                       </td>
                       <td
-                        style={{ textAlign: "right" }}
                         className='border border-black p-1 '
+                        style={{ textAlign: "center" }}
                       ></td>
                       <td
-                        style={{ textAlign: "right" }}
                         className='border border-black p-1'
+                        style={{ textAlign: "center" }}
                       >
-                        {totals.total?.toFixed(2) || "0.00"}
+                        {formatCurrency(totals.total)}
                       </td>
                       <td
-                        style={{ textAlign: "right" }}
                         className='border border-black p-1'
+                        style={{ textAlign: "center" }}
                       >
-                        {((totals.total || 0) * 0.06).toFixed(2)}
+                        {formatCurrency(totals.sgst)}
                       </td>
                       <td
-                        style={{ textAlign: "right" }}
                         className='border border-black p-1'
+                        style={{ textAlign: "center" }}
                       >
-                        {totals.cgst?.toFixed(2) || "0.00"}
+                        {formatCurrency(totals.cgst)}
                       </td>
                       <td
-                        style={{ textAlign: "right" }}
                         className='border border-black p-1 '
+                        style={{ textAlign: "center" }}
                       >
-                        {invoice.finalAmount?.toFixed(2) || "0.00"}
+                        {formatCurrency(invoiceData.finalAmount)}
                       </td>
                     </tr>
                   )}
@@ -1402,7 +1414,7 @@ const GenerateInvoice = () => {
 
               {pageIndex < billingChunks.length - 1 && (
                 <div
-                  className='invoice-footer ' id="invoice"
+                  className='invoice-footer'
                   style={{
                     display: "flex",
                     padding: "2px",
@@ -1457,22 +1469,24 @@ const GenerateInvoice = () => {
 
               {pageIndex === billingChunks.length - 1 && (
                 <div
-                  className='invoice-footer '
+                  className='invoice-footer'
                   style={{
                     display: "flex",
-                    // padding: "25px",
                     paddingBottom: "0",
                     marginTop: "-16px",
                     fontSize: "11px",
                     gap: "6px",
-                    // padding:"10px",
                     border: "1px solid black",
-                    // borderTop: "0",
                     width: "100%",
                   }}
                 >
-                  <div style={{ paddingTop:"25px",
-                       paddingBottom:"25px",  paddingLeft: "10px", }}>
+                  <div
+                    style={{
+                      paddingTop: "25px",
+                      paddingBottom: "25px",
+                      paddingLeft: "10px",
+                    }}
+                  >
                     <p style={{ marginBottom: "0", whiteSpace: "nowrap" }}>
                       Goods once sold will not be taken back
                     </p>
@@ -1485,17 +1499,12 @@ const GenerateInvoice = () => {
                     </p>
                     <p className='mb-0'>E.&.O.ES</p>
                   </div>
-                  {/* //!SGST */}
                   <div
-
                     style={{
-                       paddingTop:"25px",
-                       paddingBottom:"25px",
-
+                      paddingTop: "25px",
+                      paddingBottom: "25px",
                       borderLeft: "1px solid black",
                       paddingLeft: "15px",
-                      // paddingRight: "15px",
-
                       margin: "0",
                     }}
                   >
@@ -1508,37 +1517,35 @@ const GenerateInvoice = () => {
                         }}
                         key={rate}
                       >
-                        {rate}%: SGST {value.sgst.toFixed(2)}, CGST{" "}
-                        {value.cgst.toFixed(2)} ={" "}
-                        {(value.sgst + value.cgst).toFixed(2)} /{" "}
-                        {value.taxable.toFixed(2)}
+                        {rate}%: SGST {formatCurrency(value.sgst)}, CGST{" "}
+                        {formatCurrency(value.cgst)} ={" "}
+                        {formatCurrency(value.sgst + value.cgst)} /{" "}
+                        {formatCurrency(value.taxable)}
                       </p>
                     ))}
                     <p
                       style={{
                         borderTop: "1px solid black",
                         paddingLeft: "5px",
-                        // paddingRight: "5px",
                         paddingTop: "8px",
                         marginBottom: "0",
                         borderTopStyle: "dashed",
                       }}
                     >
                       SGST AMT{" "}
-                      {Object.values(gstSummary)
-                        .reduce((sum, val) => sum + val.sgst, 0)
-                        .toFixed(2)}
+                      {formatCurrency(
+                        Object.values(gstSummary).reduce((sum, val) => sum + val.sgst, 0)
+                      )}
                       , CGST AMT :{" "}
-                      {Object.values(gstSummary)
-                        .reduce((sum, val) => sum + val.cgst, 0)
-                        .toFixed(2)}
+                      {formatCurrency(
+                        Object.values(gstSummary).reduce((sum, val) => sum + val.cgst, 0)
+                      )}
                     </p>
                   </div>
                   <div
                     style={{
                       width: "100%",
-                      textAlign: "",
-                       paddingRight: "5px",
+                      paddingRight: "5px",
                       borderLeft: "1px solid black",
                       paddingLeft: "6px",
                       fontSize: "13px",
@@ -1559,10 +1566,10 @@ const GenerateInvoice = () => {
                       <span
                         style={{
                           textAlign: "right",
-                        fontSize: "15px",
+                          fontSize: "15px",
                         }}
                       >
-                        {invoice.finalAmount?.toFixed(2)}
+                        {formatCurrency(invoiceData.finalAmount)}
                       </span>
                     </h5>
                     <span
