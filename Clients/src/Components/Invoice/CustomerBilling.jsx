@@ -23,6 +23,7 @@ const CustomerBilling = ({ onDataChange, resetTrigger, onNextFocus }) => {
 
   const [salesmen, setSalesmen] = useState([]);
   const [selectedSalesman, setSelectedSalesman] = useState(null);
+  const [test, setTest] = useState(null);
 
   const [beatsOptions, setBeatsOptions] = useState([]);
   const [selectedBeat, setSelectedBeat] = useState(null);
