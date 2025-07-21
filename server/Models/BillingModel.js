@@ -18,6 +18,10 @@ const BillingItemSchema = new mongoose.Schema({
   amount: Number,
 });
 
+//rate,schAmt,amount,total
+//gst,
+// cd, cdAmount,sch
+
 const CustomerInfoSchema = new mongoose.Schema({
   CustomerName: String,
   Billdate: Date,
