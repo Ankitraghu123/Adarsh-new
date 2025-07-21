@@ -116,7 +116,53 @@ const createBilling = async (req, res) => {
   }
 };
 
+
+// const getAllInvoices = async (req, res) => {
+//   try {
+//     const invoices = await Invoice.find()
+//       .sort({ createdAt: -1 })
+//       .populate("companyId")
+//       .populate("salesmanId")
+//       .populate("billing.productId")
+//       .populate("customerId");
+
+//     const formattedInvoices = invoices.map((invoice) => {
+//       const formattedBilling = invoice.billing.map((item) => {
+//         const i = item.toObject();
+//         return {
+//           ...i,
+//           rate: Number(i.rate).toFixed(2),        // e.g., "33.00"
+//           schAmt: Number(i.schAmt).toFixed(2),
+//           cdAmt: Number(i.cdAmt).toFixed(2),
+//           total: Number(i.total).toFixed(2),
+//           amount: Number(i.amount).toFixed(2),
+//           gst: Number(i.gst).toFixed(1),          // e.g., "5.0"
+//           cd: Number(i.cd).toFixed(1),            // "4.0"
+//           sch: Number(i.sch).toFixed(1),          // "2.0"
+//         };
+//       });
+
+//       return {
+//         ...invoice.toObject(),
+//         billing: formattedBilling,
+//       };
+//     });
+
+//     res.status(200).json(formattedInvoices);
+//   } catch (error) {
+//     console.error("Error fetching invoices:", error);
+//     res.status(500).json({ error: "Failed to fetch invoices" });
+//   }
+// };
+
+
+
+
+
 const getAllInvoices = async (req, res) => {
+
+
+
   try {
     const invoices = await Invoice.find()
       .sort({ createdAt: -1 })
@@ -131,6 +177,8 @@ const getAllInvoices = async (req, res) => {
     res.status(500).json({ error: "Failed to fetch invoices" });
   }
 };
+
+
 
 // DELETE /pro-billing/:id
 const deleteInvoice = async (req, res) => {
@@ -149,26 +197,73 @@ const deleteInvoice = async (req, res) => {
   }
 };
 
+
+
 // GET /api/pro-billing/:id
+// const getInvoiceById = async (req, res) => {
+//   try {
+//     const invoice = await Invoice.findById(req.params.id)
+//       .populate("companyId")
+//       .populate("salesmanId")
+//       .populate("billing.productId") // ✅ full product fields
+//       .populate("customerId", "firm name mobile address gstNumber"); // ✅ full customer fields
+      
+//     // ✅ Add this
+
+//     if (!invoice) {
+//       return res.status(404).json({ message: "Invoice not found" });
+//     }
+//     res.status(200).json(invoice);
+//   } catch (error) {
+//     console.error("Error fetching invoice:", error);
+//     res.status(500).json({ error: "Failed to fetch invoice" });
+//   }
+// };
+
+
+
+
+// Get  invoice by id
 const getInvoiceById = async (req, res) => {
   try {
     const invoice = await Invoice.findById(req.params.id)
       .populate("companyId")
       .populate("salesmanId")
-      .populate("billing.productId") // ✅ full product fields
-      .populate("customerId", "firm name mobile address gstNumber"); // ✅ full customer fields
-
-    // ✅ Add this
+      .populate("billing.productId")
+      .populate("customerId", "firm name mobile address gstNumber");
 
     if (!invoice) {
       return res.status(404).json({ message: "Invoice not found" });
     }
-    res.status(200).json(invoice);
+
+    // Format billing fields
+    const formattedBilling = invoice.billing.map((item) => ({
+      ...item.toObject(),
+      rate: item.rate.toFixed(2),
+      amount: item.amount.toFixed(2),
+      total: item.total.toFixed(2),
+      cdAmt: item.cdAmt.toFixed(2),
+      schAmt: item.schAmt.toFixed(2),
+      gst: Number(item.gst).toFixed(1), // single decimal place
+      cd: `${Number(item.cd).toFixed(1)}%`,
+      sch: `${Number(item.sch).toFixed(1)}%`,
+    }));
+
+    // Create a formatted response with modified billing
+    const formattedInvoice = {
+      ...invoice.toObject(),
+      billing: formattedBilling,
+    };
+
+    res.status(200).json(formattedInvoice);
   } catch (error) {
     console.error("Error fetching invoice:", error);
     res.status(500).json({ error: "Failed to fetch invoice" });
   }
 };
+
+
+
 
 const getInvoicesByCustomer = async (req, res) => {
   const { customerIdOrName } = req.params;
@@ -218,6 +313,7 @@ const getInvoicesByCustomer = async (req, res) => {
   }
 };
 
+
 const getBalanceByCustomer = async (req, res) => {
   try {
     console.log(req.params, "➡️ Get Balance by Customer");
@@ -250,6 +346,7 @@ const getBalanceByCustomer = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
 
 const adjustNewRef = async (req, res) => {
   // console.log("[adjustPayment] Incoming:", req.body);
