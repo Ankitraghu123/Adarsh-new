@@ -9,14 +9,53 @@ body {
   overflow-x: hidden;
 }
 
-.liness{
+
+
+
+
+/* Make sidebar buttons and links show a clear focus border */
+
+.sidebar .btn:focus,
+.sidebar a:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px #ffffff; /* White border glow */
+  border-radius: 4px; /* Rounded corners for a clean look */
+}
+
+.sidebar .btn:focus-visible,
+.sidebar a:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px #ffffff;
+  border-radius: 4px;
+}
+
+/* Optional: Add a slight background highlight on focus */
+.sidebar .btn:focus,
+.sidebar .btn:focus-visible {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.sidebar a:focus,
+.sidebar a:focus-visible {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Smooth transition */
+.sidebar .btn,
+.sidebar a {
+  transition: box-shadow 0.2s, background-color 0.2s;
+}
+
+
+
+.liness {
   height: 10px;
-  width: 2px ;
+  width: 2px;
   background-color: black;
 
 }
 
-.line-main{
+.line-main {
 
   display: flex;
   justify-content: center;
@@ -32,7 +71,7 @@ body {
   padding-bottom: 0 !important;
   margin-top: 0 !important;
   margin-bottom: 0 !important;
-    font-weight: 900;
+  font-weight: 900;
 
 
 }
