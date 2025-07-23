@@ -101,40 +101,39 @@ const Outstanding = () => {
   ];
 
   return (
-    <div className='p-3' style={{ fontFamily: "Arial, sans-serif" }}>
-      {/* Modal Form */}
-      <Modal show={showModal} backdrop='static' keyboard={false} centered>
+    <div className="p-3" style={{ fontFamily: "Arial, sans-serif" }}>
+      <Modal show={showModal} backdrop="static" keyboard={false} centered>
         <Modal.Header>
           <Modal.Title>Filter Outstanding Report</Modal.Title>
         </Modal.Header>
         <Form onSubmit={handleModalSubmit}>
           <Modal.Body>
-            <Form.Group className='mb-3'>
+            <Form.Group className="mb-3">
               <Form.Label>Select Customer</Form.Label>
               <Form.Select
                 value={selectedCustomer}
                 onChange={(e) => setSelectedCustomer(e.target.value)}
                 required
               >
-                <option value=''>-- Select Customer --</option>
-                <option value='Ashoka Garden'>Ashoka Garden</option>
-                <option value='MP Nagar'>MP Nagar</option>
-                <option value='New Market'>New Market</option>
+                <option value="">-- Select Customer --</option>
+                <option value="Ashoka Garden">Ashoka Garden</option>
+                <option value="MP Nagar">MP Nagar</option>
+                <option value="New Market">New Market</option>
               </Form.Select>
             </Form.Group>
-            <Form.Group className='mb-3'>
+            <Form.Group className="mb-3">
               <Form.Label>Start Date</Form.Label>
               <Form.Control
-                type='date'
+                type="date"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
                 required
               />
             </Form.Group>
-            <Form.Group className='mb-3'>
+            <Form.Group className="mb-3">
               <Form.Label>End Date</Form.Label>
               <Form.Control
-                type='date'
+                type="date"
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
                 required
@@ -142,50 +141,36 @@ const Outstanding = () => {
             </Form.Group>
           </Modal.Body>
           <Modal.Footer>
-            <Button variant='primary' type='submit'>
+            <Button variant="primary" type="submit">
               View Report
             </Button>
           </Modal.Footer>
         </Form>
       </Modal>
 
-      {/* Show Table Only After Modal Closes */}
       {!showModal && (
         <>
-          <h5
-            style={{ border: "2px solid rgba(8, 98, 255, 0.873)" }}
-            className='text-center fw-bold mb-0 py-2'
-          >
+          <h5 style={{ border: "2px solid rgba(8, 98, 255, 0.873)" }} className="text-center fw-bold mb-0 py-2">
             SAMRIDHI ENTERPRISES
           </h5>
-          <h3
-            style={{ border: "1px solid rgba(8, 98, 255, 0.873)" }}
-            className='text-center fw-bold mb-0 py-2'
-          >
+          <h3 style={{ border: "1px solid rgba(8, 98, 255, 0.873)" }} className="text-center fw-bold mb-0 py-2">
             ASHOKA GARDEN OUTSTANDING AS ON 18-07-2025
           </h3>
 
-          <Table
-            bordered
-            responsive
-            className='mb-0'
-            style={{ fontSize: "14px" }}
-          >
+          <Table bordered responsive className="mb-0" style={{ fontSize: "14px" }}>
             <thead>
-              <tr id='new-tabl' className='text-center fw-bold'>
-                <th colSpan='1'>TOTAL NO. </th>
-                <th colSpan='2'>BILLS : {tableData.length}</th>
-                <th colSpan='2'>GRAND TOTAL :</th>
+              <tr id="new-tabl" className="text-center fw-bold">
+                <th colSpan="1">TOTAL NO. </th>
+                <th colSpan="2">BILLS : {tableData.length}</th>
+                <th colSpan="2">GRAND TOTAL :</th>
                 <th>
-                  {tableData
-                    .reduce((acc, row) => acc + parseFloat(row.billValue), 0)
-                    .toFixed(2)}
+                  {tableData.reduce((acc, row) => acc + parseFloat(row.billValue), 0).toFixed(2)}
                 </th>
-                <th colSpan='4'></th>
+                <th colSpan="4"></th>
               </tr>
             </thead>
             <thead>
-              <tr id='new-table' className='text-center border'>
+              <tr id="new-table" className="text-center border">
                 <th style={{ width: "8%" }}>Sr No.</th>
                 <th style={{ width: "8%" }}>INVOICE</th>
                 <th style={{ width: "8%" }}>DATE</th>
@@ -199,7 +184,7 @@ const Outstanding = () => {
             </thead>
             <tbody>
               {tableData.map((row, index) => (
-                <tr id='new-table1' key={index} className='text-center'>
+                <tr id="new-table1" key={index} className="text-center">
                   <td style={{ textAlign: "right" }}>{index + 1}</td>
                   <td style={{ textAlign: "left" }}>{row.invoice}</td>
                   <td style={{ textAlign: "left" }}>{row.date}</td>

@@ -473,6 +473,24 @@ table th {
   /* Default for larger screens */
 }
 
+#new-tabl {
+  border-top: none !important;
+   border: 3px solid rgba(8, 98, 255, 0.873);
+}
+
+#new-table th{
+  border: 1px solid rgba(8, 98, 255, 0.873);
+}
+
+#new-tabl th{
+  border: 1px solid rgba(8, 98, 255, 0.873);
+}
+#new-table1 td{
+  border: 1px solid rgba(8, 98, 255, 0.873);
+}
+
+
+
 /* Show dropdown on hover (desktop only) */
 
 /* Mobile view dropdown compact */
@@ -734,4 +752,11 @@ Table tr {
   background-color: transparent !important;
   border: none;
   text-align: center;
+}
+
+/* ------------my-css--siddhant------------ */
+/* App.css */
+.nowrap-table th,
+.nowrap-table td {
+  white-space: nowrap !important;
 }
