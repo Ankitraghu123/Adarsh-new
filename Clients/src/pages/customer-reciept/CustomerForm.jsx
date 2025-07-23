@@ -12,6 +12,7 @@ import {
   fetchBalanceByCustomer,
   fetchInvoicesByCustomer,
 } from "../../redux/features/product-bill/invoiceThunks";
+import axiosInstance from "../../Config/axios";
 
 const CustomerForm = () => {
   const [showModal, setShowModal] = useState(false);
@@ -43,7 +44,25 @@ const CustomerForm = () => {
     (state) => state.invoice
   );
 
-  // console.log("Invoices by Customer:", invoicesByCustomer);
+  // !
+  const [voucherNumber, setVoucherNumber] = useState("");
+
+  // Fetch next voucher number
+  const fetchNextVoucherNumber = async () => {
+    try {
+      const res = await axiosInstance.get("/ledger/next-voucher-number");
+      setVoucherNumber(res.data.nextVoucherNumber);
+    } catch (err) {
+      console.error("Error fetching voucher number:", err);
+    }
+  };
+
+  // On component mount, fetch voucher number
+  useEffect(() => {
+    fetchNextVoucherNumber();
+  }, []);
+
+  // !
 
   const handleOpenPendingBills = (rowIdx) => {
     setPendingRowIndex(rowIdx);
@@ -204,7 +223,9 @@ const CustomerForm = () => {
               <Col sm={8}>
                 <Form.Control
                   type='text'
-                  placeholder='Enter Voucher No.'
+                  value={voucherNumber}
+                  readOnly
+                  placeholder='Auto-generated'
                   ref={(el) => (formRefs.current[1] = el)}
                   onKeyDown={(e) => handleKeyDown(e, 1)}
                 />

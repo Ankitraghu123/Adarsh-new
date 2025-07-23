@@ -1,5 +1,3 @@
-// // models/Invoice.js
-
 const mongoose = require("mongoose");
 
 const BillingItemSchema = new mongoose.Schema({
@@ -17,10 +15,6 @@ const BillingItemSchema = new mongoose.Schema({
   gst: Number,
   amount: Number,
 });
-
-//rate,schAmt,amount,total
-//gst,
-// cd, cdAmount,sch
 
 const CustomerInfoSchema = new mongoose.Schema({
   CustomerName: String,

@@ -1,5 +1,3 @@
-
-
 import React from "react";
 import { Table, Button, Container, Row, Col, Alert } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -18,15 +16,6 @@ const Dashboard = () => {
         <h5 className='mb-0 fw-bold'>Welcome Aadrsh Agency</h5>
         {/* <span className='text-secondary'>EN</span> */}
       </div>
-
-      {/* GST Banner */}
-      {/* <Alert variant='warning' className='m-0 rounded-0 py-2 px-4 text-sm'>
-        <strong>[GST Update]</strong> : New GST rules update: E-Invoicing
-        Mandatory for 5cr+ turnover{" "}
-        <a href='#' className='text-danger text-decoration-underline'>
-          Read More
-        </a>
-      </Alert> */}
 
       {/* Stats Cards */}
       <div fluid className='py-4'>

@@ -11,6 +11,7 @@ import {
 } from "../../redux/features/vendor/VendorThunks";
 
 import { getBalance } from "../../redux/features/purchase/purchaseThunks";
+import axiosInstance from "../../Config/axios";
 
 const PaymentVoucherForm = () => {
   const [showModal, setShowModal] = useState(false);
@@ -38,6 +39,23 @@ const PaymentVoucherForm = () => {
   const vendorList = useSelector((state) => state.vendor.vendors);
   const vendorBills = useSelector((state) => state.vendor.vendorBills);
   const balance = useSelector((state) => state.purchase?.balance);
+
+  const [voucherNumber, setVoucherNumber] = useState("");
+
+  const fetchNextVoucherNumber = async () => {
+    try {
+      const res = await axiosInstance.get(
+        "/vendor/ledger/next-vendor-voucher-number"
+      );
+      setVoucherNumber(res.data.nextVoucherNumber);
+    } catch (err) {
+      console.error("Error fetching vendor voucher number:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchNextVoucherNumber();
+  }, []);
 
   const handleOpenPendingBills = (rowIdx) => {
     setPendingRowIndex(rowIdx);
@@ -198,7 +216,9 @@ const PaymentVoucherForm = () => {
               <Form.Label>Voucher No.</Form.Label>
               <Form.Control
                 type='text'
-                placeholder='Enter Voucher No.'
+                value={voucherNumber}
+                readOnly
+                placeholder='Auto-generated'
                 ref={(el) => (formRefs.current[1] = el)}
                 onKeyDown={(e) => handleKeyDown(e, 1)}
               />

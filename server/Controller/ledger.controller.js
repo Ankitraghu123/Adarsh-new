@@ -37,3 +37,29 @@ exports.getLedgerByVendor = async (req, res) => {
     });
   }
 };
+
+exports.getNextVendorVoucherNumber = async (req, res) => {
+  try {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = now.getMonth() + 1;
+    const fy =
+      month >= 4
+        ? `${String(year).slice(2)}-${String(year + 1).slice(2)}`
+        : `${String(year - 1).slice(2)}-${String(year).slice(2)}`;
+
+    const last = await Ledger.findOne().sort({ createdAt: -1 });
+
+    let next = 1;
+    if (last && last.voucherNumber) {
+      const lastNo = last.voucherNumber.split("/")[2];
+      next = parseInt(lastNo) + 1;
+    }
+
+    const nextVoucher = `VL/${fy}/${String(next).padStart(4, "0")}`;
+
+    res.json({ nextVoucherNumber: nextVoucher });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
