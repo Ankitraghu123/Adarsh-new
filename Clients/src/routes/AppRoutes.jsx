@@ -26,7 +26,9 @@ import PaymentVoucherForm from "../Components/payment/PaymentVoucherForm";
 import Ledger from "../pages/customer-reciept/Ledger";
 import CustomerForm from "../pages/customer-reciept/CustomerForm";
 import VendorLedger from "../Components/payment/vendorLedger";
+
 import Outstanding from "../pages/Outstanding";
+
 
 const AppRoutes = () => {
   return (
@@ -49,6 +51,8 @@ const AppRoutes = () => {
         <Route path='/Vendor-report' element={<VendorReport />} />
         <Route path='/purchase' element={<PurchaseForm />} />
         <Route path='/add-customer' element={<CustomerDetail />} />
+      
+
 
         <Route path='/test' element={<PaymentVoucherForm />} />
         <Route path='/report' element={<CustomerForm />} />
