@@ -21,6 +21,18 @@ export const createInvoice = createAsyncThunk(
     }
   }
 );
+// ✏️ Update an invoice
+export const updateInvoice = createAsyncThunk(
+  "invoice/updateInvoice",
+  async ({ id, invoiceData }, { rejectWithValue }) => {
+    try {
+      const res = await axios.put(`${API_URL}/${id}`, invoiceData);
+      return res.data.invoice;
+    } catch (err) {
+      return rejectWithValue(getError(err));
+    }
+  }
+);
 
 // 📥 Fetch all invoices
 export const fetchInvoices = createAsyncThunk(

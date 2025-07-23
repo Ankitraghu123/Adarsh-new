@@ -7,7 +7,7 @@ const Salesman = require("../Models/SalesManModel");
 const mongoose = require("mongoose");
 
 const createBilling = async (req, res) => {
-  console.log("[createBilling] Incoming:", req.body);
+  // console.log("[createBilling] Incoming:", req.body);
 
   try {
     const { customer, billing, finalAmount } = req.body;
@@ -116,53 +116,124 @@ const createBilling = async (req, res) => {
   }
 };
 
+// ✅ PUT /pro-billing/:id
+const updateBilling = async (req, res) => {
+  try {
+    const invoiceId = req.params.id;
+    const { customer, billing, finalAmount } = req.body;
 
-// const getAllInvoices = async (req, res) => {
-//   try {
-//     const invoices = await Invoice.find()
-//       .sort({ createdAt: -1 })
-//       .populate("companyId")
-//       .populate("salesmanId")
-//       .populate("billing.productId")
-//       .populate("customerId");
+    const {
+      Billdate,
+      paymentMode,
+      customerName,
+      salesmanName,
+      selectedBeatId,
+      selectedCustomerId,
+      selectedSalesmanId,
+      billingType,
+    } = customer;
 
-//     const formattedInvoices = invoices.map((invoice) => {
-//       const formattedBilling = invoice.billing.map((item) => {
-//         const i = item.toObject();
-//         return {
-//           ...i,
-//           rate: Number(i.rate).toFixed(2),        // e.g., "33.00"
-//           schAmt: Number(i.schAmt).toFixed(2),
-//           cdAmt: Number(i.cdAmt).toFixed(2),
-//           total: Number(i.total).toFixed(2),
-//           amount: Number(i.amount).toFixed(2),
-//           gst: Number(i.gst).toFixed(1),          // e.g., "5.0"
-//           cd: Number(i.cd).toFixed(1),            // "4.0"
-//           sch: Number(i.sch).toFixed(1),          // "2.0"
-//         };
-//       });
+    const pendingAmount = Number(finalAmount);
 
-//       return {
-//         ...invoice.toObject(),
-//         billing: formattedBilling,
-//       };
-//     });
+    // ✅ Find existing invoice
+    const invoice = await Invoice.findById(invoiceId);
+    if (!invoice) {
+      return res.status(404).json({ error: "Invoice not found" });
+    }
 
-//     res.status(200).json(formattedInvoices);
-//   } catch (error) {
-//     console.error("Error fetching invoices:", error);
-//     res.status(500).json({ error: "Failed to fetch invoices" });
-//   }
-// };
+    // ✅ Find customer & salesman
+    const existingCustomer = await Customer.findById(selectedCustomerId);
+    if (!existingCustomer) {
+      return res.status(404).json({ error: "Customer not found" });
+    }
 
+    const existingSalesman = await Salesman.findById(selectedSalesmanId);
 
+    // ✅ Restore stock for previous billing (Optional but IMPORTANT!)
+    for (const oldItem of invoice.billing) {
+      const totalQty = (oldItem.qty || 0) + (oldItem.Free || 0);
+      const product = await Product.findById(oldItem.productId);
+      if (product) {
+        product.availableQty += totalQty; // Revert previous stock deduction
+        await product.save();
+      }
+    }
 
+    // ✅ Update fields
+    invoice.customer = {
+      CustomerName: customerName || existingCustomer.name || "",
+      Billdate: new Date(Billdate),
+      paymentMode: paymentMode || "",
+      salesmanName: salesmanName || existingSalesman?.name || "",
+      selectedBeatId: selectedBeatId || null,
+      selectedCustomerId: selectedCustomerId || null,
+      selectedSalesmanId: selectedSalesmanId || null,
+      billingType: billingType || "Credit",
+    };
+    invoice.billing = billing;
+    invoice.billingType = billingType;
+    invoice.finalAmount = pendingAmount;
+    invoice.pendingAmount = pendingAmount; // or handle partial payments logic here
+    invoice.customerId = selectedCustomerId;
+    invoice.customerName = existingCustomer.name;
+    invoice.salesmanId = selectedSalesmanId;
+    invoice.salesmanName = existingSalesman?.name || "";
 
+    await invoice.save();
+
+    // ✅ Update Customer balance — adjust difference only
+    const oldBalance = invoice.finalAmount;
+    const balanceDiff = pendingAmount - oldBalance;
+    existingCustomer.totalBalance += balanceDiff;
+    await existingCustomer.save();
+
+    // ✅ Delete old ledger entries and add new one if you want
+    // Or update them smartly
+    await Ledger.deleteMany({ refType: "invoice", refId: invoice._id });
+
+    const ledger = new Ledger({
+      refType: "invoice",
+      refId: invoice._id,
+      narration: `Invoice updated for customer ${existingCustomer.name}`,
+      debitAccount: `Customer: ${existingCustomer.name}`,
+      creditAccount: "Sales Income",
+      amount: pendingAmount,
+      companyId: invoice.companyId,
+      customerId: existingCustomer._id,
+    });
+    await ledger.save();
+
+    invoice.ledgerIds = [ledger._id];
+    await invoice.save();
+
+    // ✅ Deduct stock for new billing
+    for (const item of billing) {
+      const totalQtyToDeduct = (item.qty || 0) + (item.Free || 0);
+      const product = await Product.findById(item.productId);
+      if (!product) {
+        throw new Error(`Product not found: ${item.productId}`);
+      }
+      if (product.availableQty < totalQtyToDeduct) {
+        throw new Error(
+          `Not enough stock for ${product.productName}. Available: ${product.availableQty}, Required: ${totalQtyToDeduct}`
+        );
+      }
+      product.availableQty -= totalQtyToDeduct;
+      product.lastUpdated = new Date();
+      await product.save();
+    }
+
+    res.status(200).json({
+      message: "Invoice updated successfully",
+      invoice,
+    });
+  } catch (err) {
+    console.error("[updateBilling] Error:", err);
+    res.status(500).json({ error: err.message });
+  }
+};
 
 const getAllInvoices = async (req, res) => {
-
-
-
   try {
     const invoices = await Invoice.find()
       .sort({ createdAt: -1 })
@@ -177,8 +248,6 @@ const getAllInvoices = async (req, res) => {
     res.status(500).json({ error: "Failed to fetch invoices" });
   }
 };
-
-
 
 // DELETE /pro-billing/:id
 const deleteInvoice = async (req, res) => {
@@ -196,32 +265,6 @@ const deleteInvoice = async (req, res) => {
     res.status(500).json({ error: "Failed to delete invoice" });
   }
 };
-
-
-
-// GET /api/pro-billing/:id
-// const getInvoiceById = async (req, res) => {
-//   try {
-//     const invoice = await Invoice.findById(req.params.id)
-//       .populate("companyId")
-//       .populate("salesmanId")
-//       .populate("billing.productId") // ✅ full product fields
-//       .populate("customerId", "firm name mobile address gstNumber"); // ✅ full customer fields
-      
-//     // ✅ Add this
-
-//     if (!invoice) {
-//       return res.status(404).json({ message: "Invoice not found" });
-//     }
-//     res.status(200).json(invoice);
-//   } catch (error) {
-//     console.error("Error fetching invoice:", error);
-//     res.status(500).json({ error: "Failed to fetch invoice" });
-//   }
-// };
-
-
-
 
 // Get  invoice by id
 const getInvoiceById = async (req, res) => {
@@ -261,9 +304,6 @@ const getInvoiceById = async (req, res) => {
     res.status(500).json({ error: "Failed to fetch invoice" });
   }
 };
-
-
-
 
 const getInvoicesByCustomer = async (req, res) => {
   const { customerIdOrName } = req.params;
@@ -313,7 +353,6 @@ const getInvoicesByCustomer = async (req, res) => {
   }
 };
 
-
 const getBalanceByCustomer = async (req, res) => {
   try {
     console.log(req.params, "➡️ Get Balance by Customer");
@@ -346,7 +385,6 @@ const getBalanceByCustomer = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
-
 
 const adjustNewRef = async (req, res) => {
   // console.log("[adjustPayment] Incoming:", req.body);
@@ -573,5 +611,6 @@ module.exports = {
   getInvoicesByCustomer,
   getBalanceByCustomer,
   adjustNewRef,
+  updateBilling,
   applyNewRef,
 };
