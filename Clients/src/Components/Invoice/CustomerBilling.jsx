@@ -9,7 +9,12 @@ import useSearchableModal from "../../Components/SearchableModal";
 
 const getCurrentDate = () => new Date().toISOString().split("T")[0];
 
-const CustomerBilling = ({ onDataChange, resetTrigger, onNextFocus }) => {
+const CustomerBilling = ({
+  onDataChange,
+  resetTrigger,
+  onNextFocus,
+  value,
+}) => {
   const isFirstRender = useRef(true);
 
   const [formData, setFormData] = useState({
@@ -598,28 +603,23 @@ const CustomerBilling = ({ onDataChange, resetTrigger, onNextFocus }) => {
                 </tr>
               </thead>
               <tbody>
-                {filteredSalesmen.map(
-                  (s, index) => (
-                    console.log(filteredSalesmen, "FILTERED"),
-                    (
-                      <tr
-                        key={s._id}
-                        ref={(el) => (salesmanRowRefs.current[index] = el)}
-                        className={
-                          index === salesmanFocusedIndex ? "table-active" : ""
-                        }
-                      >
-                        <td>{s.name}</td>
-                        <td>{s.mobile}</td>
-                        <td>{s.alternateMobile}</td>
-                        <td>{s.beat.map((b) => b.area).join(", ")}</td>
-                        <td>{s.address}</td>
-                        <td>{s.city}</td>
-                        <td>{s.username}</td>
-                      </tr>
-                    )
-                  )
-                )}
+                {filteredSalesmen.map((s, index) => (
+                  <tr
+                    key={s._id}
+                    ref={(el) => (salesmanRowRefs.current[index] = el)}
+                    className={
+                      index === salesmanFocusedIndex ? "table-active" : ""
+                    }
+                  >
+                    <td>{s.name}</td>
+                    <td>{s.mobile}</td>
+                    <td>{s.alternateMobile}</td>
+                    <td>{s.beat.map((b) => b.area).join(", ")}</td>
+                    <td>{s.address}</td>
+                    <td>{s.city}</td>
+                    <td>{s.username}</td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>

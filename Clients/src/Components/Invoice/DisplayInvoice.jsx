@@ -6,6 +6,7 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
 import Loader from "../Loader";
+import { FaPrint, FaEdit, FaTrash } from "react-icons/fa";
 
 import useSearchableModal from "../../Components/SearchableModal"; // adjust path if needed
 
@@ -89,50 +90,6 @@ const DisplayInvoice = () => {
     }
   };
 
-  // 🔑 Handle F10, Arrow Keys, Enter
-  // useEffect(() => {
-  //   const handleKeyDown = (e) => {
-  //     if (e.key === "F10") {
-  //       e.preventDefault();
-  //       setShowModal(true);
-  //       setFocusedIndex(0);
-  //     }
-
-  //     if (showModal) {
-  //       if (e.key === "ArrowDown") {
-  //         e.preventDefault();
-  //         setFocusedIndex(
-  //           (prev) => (prev < visibleItems.length - 1 ? prev + 1 : prev) // ✅ use visibleItems
-  //         );
-  //       }
-
-  //       if (e.key === "ArrowUp") {
-  //         e.preventDefault();
-  //         setFocusedIndex(
-  //           (prev) => (prev > 0 ? prev - 1 : 0) // ✅ safe fallback
-  //         );
-  //       }
-
-  //       if (e.key === "Enter") {
-  //         e.preventDefault();
-  //         const selected = visibleItems[focusedIndex]; // ✅ NEW: use visibleItems
-  //         if (selected) {
-  //           navigate(`/generate-invoice/${selected._id}`);
-  //           setShowModal(false);
-  //         }
-  //       }
-
-  //       if (e.key === "Escape") {
-  //         e.preventDefault();
-  //         setShowModal(false);
-  //       }
-  //     }
-  //   };
-
-  //   window.addEventListener("keydown", handleKeyDown);
-  //   return () => window.removeEventListener("keydown", handleKeyDown);
-  // }, [showModal, filteredItems, focusedIndex]);
-
   const visibleItems = filterText.trim() === "" ? invoices : filteredItems;
 
   useEffect(() => {
@@ -188,7 +145,7 @@ const DisplayInvoice = () => {
     return <Loader />;
   }
 
-  console.log(visibleItems, "LIONMs");
+  // console.log(visibleItems, "LIONMs");
 
   return (
     <div className='w-full mt-4 px-3'>
@@ -204,13 +161,14 @@ const DisplayInvoice = () => {
         >
           <thead className='bg-light sticky-top' style={{ top: 0, zIndex: 1 }}>
             <tr>
+              <th>Customer Name</th>
               <th style={{ width: "120px" }}>Date</th>
               <th>Item Purchased</th>
               <th>Quantity</th>
               <th>Free</th>
               <th>Total Qty</th>
               <th>Total Price</th>
-              <th>Print</th>
+              {/* <th>Print</th> */}
               <th>Action</th>
             </tr>
           </thead>
@@ -221,6 +179,7 @@ const DisplayInvoice = () => {
 
               return (
                 <tr key={invoice._id}>
+                  <td>{customer.CustomerName}</td>
                   <td>
                     {customer.Billdate
                       ? new Date(customer.Billdate).toLocaleDateString()
@@ -265,7 +224,7 @@ const DisplayInvoice = () => {
 
                   <td>{invoice.finalAmount || 0}</td>
 
-                  <td>
+                  {/* <td>
                     <Button
                       variant='outline-primary'
                       size='sm'
@@ -283,6 +242,36 @@ const DisplayInvoice = () => {
                     >
                       Delete
                     </Button>
+                  </td> */}
+
+                  <td
+                    style={{
+                      display: "flex",
+                      gap: "15px",
+                      alignContent: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <FaPrint
+                      size={24}
+                      style={{ cursor: "pointer", color: "#0d6efd" }}
+                      title='Print'
+                      onClick={() => handlePrint(invoice._id)}
+                    />
+
+                    <FaEdit
+                      size={24}
+                      style={{ cursor: "pointer", color: "#198754" }}
+                      title='Edit'
+                      onClick={() => navigate(`/add-invoice/${invoice._id}`)}
+                    />
+
+                    <FaTrash
+                      size={24}
+                      style={{ cursor: "pointer", color: "#dc3545" }}
+                      title='Delete'
+                      onClick={() => handleDelete(invoice._id)}
+                    />
                   </td>
                 </tr>
               );

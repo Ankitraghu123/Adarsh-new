@@ -1,5 +1,3 @@
-
-
 import React, { useEffect, useState, useMemo, useCallback } from "react";
 import { Table } from "react-bootstrap";
 import { useParams } from "react-router-dom";
@@ -46,7 +44,9 @@ const GenerateInvoice = () => {
       setLoading(true);
       setError(null);
       try {
-        const invoiceResponse = await axios.get(`/pro-billing/${id}`, { signal });
+        const invoiceResponse = await axios.get(`/pro-billing/${id}`, {
+          signal,
+        });
         const invoice = invoiceResponse.data;
         setInvoiceData(invoice);
 
@@ -65,9 +65,7 @@ const GenerateInvoice = () => {
         // Fetch unique product details
         const uniqueProductIds = [
           ...new Set(
-            billingItems
-              .map((item) => item.productId?._id)
-              .filter(Boolean) // Filter out null/undefined IDs
+            billingItems.map((item) => item.productId?._id).filter(Boolean) // Filter out null/undefined IDs
           ),
         ];
 
@@ -97,8 +95,8 @@ const GenerateInvoice = () => {
         }
         setProductDetailsMap(productMap);
       } catch (err) {
-        if (err.name === 'CanceledError') {
-          console.log('Fetch aborted');
+        if (err.name === "CanceledError") {
+          console.log("Fetch aborted");
         } else {
           console.error("Error fetching invoice:", err);
           setError("Failed to load invoice. Please try again.");
@@ -128,7 +126,14 @@ const GenerateInvoice = () => {
         acc.totalSchAmt += parseFloat(item.schAmt) || 0;
         return acc;
       },
-      { basicAmount: 0, sgst: 0, cgst: 0, total: 0, totalQty: 0, totalSchAmt: 0 }
+      {
+        basicAmount: 0,
+        sgst: 0,
+        cgst: 0,
+        total: 0,
+        totalQty: 0,
+        totalSchAmt: 0,
+      }
     );
   }, [invoiceData]);
 
@@ -157,7 +162,16 @@ const GenerateInvoice = () => {
   }, [invoiceData, productDetailsMap]);
 
   const { customer = {}, billing = [], salesmanId = {} } = invoiceData || {};
-  const billingChunks = useMemo(() => chunkArray(billing, ITEMS_PER_PAGE), [billing]);
+  const billingChunks = useMemo(
+    () => chunkArray(billing, ITEMS_PER_PAGE),
+    [billing]
+  );
+
+  useEffect(() => {
+    if (!loading && invoiceData) {
+      window.print();
+    }
+  }, [loading, invoiceData]);
 
   if (error) return <p className='text-danger'>{error}</p>;
   if (loading || !invoiceData) return <Loader />;
@@ -171,17 +185,7 @@ const GenerateInvoice = () => {
         >
           Print Invoice
         </button>
-
-
-
-
-
-
       </div>
-
-
-
-
 
       <style>
         {`
@@ -250,8 +254,6 @@ const GenerateInvoice = () => {
 `}
       </style>
 
-
-
       <div id='print-area' style={{ lineHeight: "1" }}>
         {billingChunks.map((chunk, pageIndex) => (
           <div
@@ -264,8 +266,6 @@ const GenerateInvoice = () => {
             }}
           >
             <div>
-
-
               <div
                 style={{
                   borderBottom: "1px dashed black",
@@ -274,18 +274,14 @@ const GenerateInvoice = () => {
                   marginTop: "0px",
                 }}
               >
-
-<div className="line-main">
-<div className="liness"></div></div>
-
+                <div className='line-main'>
+                  <div className='liness'></div>
+                </div>
 
                 <div className='d-flex mt-2'>
-                  
-
                   <p style={{ marginBottom: "0px", fontSize: "14px" }}>
                     <strong>GSTIN: 23BJUPR9537F1ZK</strong>
                   </p>
-
 
                   <h2
                     style={{
@@ -319,9 +315,6 @@ const GenerateInvoice = () => {
                   MOB: 9926793332, 9893315590
                 </p>
               </div>
-
-
-
 
               <div
                 style={{
@@ -365,39 +358,29 @@ const GenerateInvoice = () => {
                   <span>
                     <strong style={{ fontSize: "13px" }}>
                       Bill No:
-                      <span style={{ fontWeight: "bold", }}>
+                      <span style={{ fontWeight: "bold" }}>
                         {invoiceData._id?.slice(-6) || "N/A"}
                       </span>
                     </strong>
                   </span>
 
-
-                  <div className="div flex flex-col">
-
-
+                  <div className='div flex flex-col'>
                     <span>
-
-                      <strong style={{ "lineHeight": "1" }}  >Date:</strong>
-                      {new Date(customer?.Billdate).toLocaleDateString("en-GB")}{" "}
+                      <strong style={{ lineHeight: "1" }}>Date:</strong>
+                      {new Date(customer?.Billdate).toLocaleDateString(
+                        "en-GB"
+                      )}{" "}
                       &nbsp; {invoiceData?.billingType || "N/A"}
-
                     </span>
 
-
-
-                    <span className="d-flex align-items-center gap-1 ">
-
+                    <span className='d-flex align-items-center gap-1 '>
                       <strong>Salesman:</strong>
                       <span> {salesmanId?.name || "N/A"} </span>{" "}
                       <strong> M.No. </strong>
                       {salesmanId?.mobile || "-"}
-
                     </span>
                   </div>
-
                 </div>
-
-
               </div>
 
               <Table
@@ -405,7 +388,6 @@ const GenerateInvoice = () => {
                 className='mt-1 table-sm'
                 style={{ fontSize: "12px", borderBottom: "none" }}
               >
-
                 <thead>
                   <tr>
                     {[
@@ -441,11 +423,10 @@ const GenerateInvoice = () => {
                   </tr>
                 </thead>
 
-
-
                 <tbody style={{ borderBottom: "1px solid black" }}>
                   {chunk.slice(0, 14).map((item, index) => {
-                    const product = productDetailsMap[item.productId?._id] || {};
+                    const product =
+                      productDetailsMap[item.productId?._id] || {};
                     const gst = parseFloat(product?.gstPercent) || 0;
 
                     const commonBodyCellStyle = {
@@ -463,7 +444,7 @@ const GenerateInvoice = () => {
                           }}
                         >
                           {/* {pageIndex * 8 + index + 1}  */}
-                          {pageIndex * ITEMS_PER_PAGE + index +1 }
+                          {pageIndex * ITEMS_PER_PAGE + index + 1}
                         </td>
                         <td
                           style={{
@@ -495,21 +476,15 @@ const GenerateInvoice = () => {
                         >
                           {item.qty || 0}
                         </td>
-                        <td style={commonBodyCellStyle}>
-                          {item.Free || 0}
-                        </td>
+                        <td style={commonBodyCellStyle}>{item.Free || 0}</td>
                         <td style={commonBodyCellStyle}>
                           {formatCurrency(item.rate)}
                         </td>
-                        <td style={commonBodyCellStyle}>
-                          {item.sch || 0}
-                        </td>
+                        <td style={commonBodyCellStyle}>{item.sch || 0}</td>
                         <td style={commonBodyCellStyle}>
                           {formatCurrency(item.schAmt)}
                         </td>
-                        <td style={commonBodyCellStyle}>
-                          {item.cd || 0}
-                        </td>
+                        <td style={commonBodyCellStyle}>{item.cd || 0}</td>
                         <td style={commonBodyCellStyle}>
                           {formatCurrency(item.total)}
                         </td>
@@ -529,7 +504,10 @@ const GenerateInvoice = () => {
                   {/* Optional horizontal line */}
                   {chunk.length > 0 && (
                     <tr>
-                      <td colSpan={14} style={{ height: "1px", padding: 0 }}></td>
+                      <td
+                        colSpan={14}
+                        style={{ height: "1px", padding: 0 }}
+                      ></td>
                     </tr>
                   )}
 
@@ -542,7 +520,8 @@ const GenerateInvoice = () => {
                             key={j}
                             style={{
                               borderRight: "1px solid black",
-                              borderLeft: j === 0 ? "1px solid black" : undefined,
+                              borderLeft:
+                                j === 0 ? "1px solid black" : undefined,
                               textAlign: "center",
                               padding: "2px",
                               height: "22px",
@@ -555,12 +534,18 @@ const GenerateInvoice = () => {
                   {/* Final row on last page */}
                   {pageIndex === billingChunks.length - 1 && (
                     <tr style={{ fontWeight: "bold" }}>
-                      <td className="border border-black p-1" style={{ textAlign: "center" }}></td>
-                      <td className="border border-black p-1" style={{ textAlign: "center" }}>
+                      <td
+                        className='border border-black p-1'
+                        style={{ textAlign: "center" }}
+                      ></td>
+                      <td
+                        className='border border-black p-1'
+                        style={{ textAlign: "center" }}
+                      >
                         Basic Amount: {formatCurrency(totals.total)}
                       </td>
                       <td
-                        className="p-1"
+                        className='p-1'
                         style={{
                           borderBottom: "1px solid black",
                           borderTop: "1px solid black",
@@ -570,7 +555,7 @@ const GenerateInvoice = () => {
                         QTY:{" "}
                       </td>
                       <td
-                        className="p-1 "
+                        className='p-1 '
                         style={{
                           whiteSpace: "nowrap",
                           borderBottom: " 1px solid black",
@@ -581,7 +566,7 @@ const GenerateInvoice = () => {
                         C/S 0
                       </td>
                       <td
-                        className="p-1"
+                        className='p-1'
                         style={{
                           borderBottom: "1px solid black",
                           borderRight: "1px solid black",
@@ -592,37 +577,58 @@ const GenerateInvoice = () => {
                       >
                         PCS:{totals.totalQty || 0}
                       </td>
-                      <td className="border border-black p-1" style={{ textAlign: "center" }}>
+                      <td
+                        className='border border-black p-1'
+                        style={{ textAlign: "center" }}
+                      >
                         0
                       </td>
-                      <td className="border border-black p-1" style={{ textAlign: "center" }}></td>
-                      <td className="border border-black p-1" style={{ textAlign: "center" }}></td>
-                      <td className="border border-black p-1" style={{ textAlign: "center" }}>
+                      <td
+                        className='border border-black p-1'
+                        style={{ textAlign: "center" }}
+                      ></td>
+                      <td
+                        className='border border-black p-1'
+                        style={{ textAlign: "center" }}
+                      ></td>
+                      <td
+                        className='border border-black p-1'
+                        style={{ textAlign: "center" }}
+                      >
                         {formatCurrency(totals.totalSchAmt)}
                       </td>
-                      <td className="border border-black p-1 " style={{ textAlign: "center" }}></td>
-                      <td className="border border-black p-1" style={{ textAlign: "center" }}>
+                      <td
+                        className='border border-black p-1 '
+                        style={{ textAlign: "center" }}
+                      ></td>
+                      <td
+                        className='border border-black p-1'
+                        style={{ textAlign: "center" }}
+                      >
                         {formatCurrency(totals.total)}
                       </td>
-                      <td className="border border-black p-1" style={{ textAlign: "center" }}>
+                      <td
+                        className='border border-black p-1'
+                        style={{ textAlign: "center" }}
+                      >
                         {formatCurrency(totals.sgst)}
                       </td>
-                      <td className="border border-black p-1" style={{ textAlign: "center" }}>
+                      <td
+                        className='border border-black p-1'
+                        style={{ textAlign: "center" }}
+                      >
                         {formatCurrency(totals.cgst)}
                       </td>
-                      <td className="border border-black p-1 " style={{ textAlign: "center" }}>
+                      <td
+                        className='border border-black p-1 '
+                        style={{ textAlign: "center" }}
+                      >
                         {formatCurrency(invoiceData.finalAmount)}
                       </td>
                     </tr>
                   )}
                 </tbody>
-
-
-
-
               </Table>
-
-
 
               {/* // first page footer  */}
               {pageIndex < billingChunks.length - 1 && (
@@ -637,10 +643,8 @@ const GenerateInvoice = () => {
                     borderTop: "0",
                     width: "100%",
                     whiteSpace: "nowrap",
-
                   }}
                 >
-
                   {/* left section  */}
                   {/* <div  style={{borderRight:"1px solid  black"}}>
                     <p style={{ marginBottom: "0", whiteSpace: "nowrap" }}>
@@ -672,12 +676,15 @@ const GenerateInvoice = () => {
                       <p style={{ marginBottom: "0", whiteSpace: "nowrap" }}>
                         Goods once sold will not be taken back
                       </p>
-                      <p style={{ marginBottom: "0" }}>Cheque bounce charges Rs. 500/-</p>
+                      <p style={{ marginBottom: "0" }}>
+                        Cheque bounce charges Rs. 500/-
+                      </p>
                       <p style={{ marginBottom: "0" }}>Credit 7 Days Only/-</p>
-                      <p style={{ marginBottom: "0" }}>Subject to Bhopal jurisdiction/-</p>
+                      <p style={{ marginBottom: "0" }}>
+                        Subject to Bhopal jurisdiction/-
+                      </p>
                       <p style={{ marginBottom: "0" }}>E.&.O.E</p>
                     </div>
-
                   </div>
 
                   {/* // right section */}
@@ -705,14 +712,8 @@ const GenerateInvoice = () => {
                       </span>
                     </p>
                   </div>
-
-
-
                 </div>
               )}
-
-
-
 
               {/* // second page footer  */}
               {pageIndex === billingChunks.length - 1 && (
@@ -728,15 +729,12 @@ const GenerateInvoice = () => {
                     width: "100%",
                   }}
                 >
-
-
                   {/* // Left section  */}
                   <div
                     style={{
                       paddingTop: "0",
                       paddingBottom: "35px",
                       paddingLeft: "5px",
-
                     }}
                   >
                     <p style={{ marginBottom: "0", whiteSpace: "nowrap" }}>
@@ -751,7 +749,6 @@ const GenerateInvoice = () => {
                     </p>
                     <p className='mb-0'>E.&.O.ES</p>
                   </div>
-
 
                   <div
                     style={{
@@ -790,15 +787,20 @@ const GenerateInvoice = () => {
                     >
                       SGST AMT{" "}
                       {formatCurrency(
-                        Object.values(gstSummary).reduce((sum, val) => sum + val.sgst, 0)
+                        Object.values(gstSummary).reduce(
+                          (sum, val) => sum + val.sgst,
+                          0
+                        )
                       )}
                       , CGST AMT :{" "}
                       {formatCurrency(
-                        Object.values(gstSummary).reduce((sum, val) => sum + val.cgst, 0)
+                        Object.values(gstSummary).reduce(
+                          (sum, val) => sum + val.cgst,
+                          0
+                        )
                       )}
                     </p>
                   </div>
-
 
                   <div
                     style={{
@@ -841,19 +843,12 @@ const GenerateInvoice = () => {
                       Page {pageIndex + 1} of {billingChunks.length}
                     </span>
                   </div>
-
-
-
                 </div>
               )}
-
-
             </div>
           </div>
         ))}
       </div>
-
-
     </div>
   );
 };
