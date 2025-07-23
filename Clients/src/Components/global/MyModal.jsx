@@ -1,5 +1,3 @@
-// MyModal.jsx
-import React from "react";
 import { useModal } from "./ModalContext";
 import {
   FaHome,

@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
+import axios from "../../Config/axios";
 import ProductBillingReport from "./ProductBillingReport";
 import CustomerBilling from "./CustomerBilling";
 import toast from "react-hot-toast";
@@ -21,7 +22,7 @@ function BillingReport() {
 
   const [originalInvoice, setOriginalInvoice] = useState(null);
 
-  console.log(customerData, "OPIO");
+  console.log(originalInvoice, "Original data");
 
   const [loading, setLoading] = useState(false);
 
