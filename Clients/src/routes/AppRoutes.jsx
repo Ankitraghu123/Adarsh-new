@@ -26,6 +26,8 @@ import PaymentVoucherForm from "../Components/payment/PaymentVoucherForm";
 import Ledger from "../pages/customer-reciept/Ledger";
 import CustomerForm from "../pages/customer-reciept/CustomerForm";
 import VendorLedger from "../Components/payment/vendorLedger";
+import Outstanding from "../pages/Outstanding";
+
 const AppRoutes = () => {
   return (
     <Routes>
@@ -52,6 +54,7 @@ const AppRoutes = () => {
         <Route path='/report' element={<CustomerForm />} />
         <Route path='/ledger' element={<Ledger />} />
         <Route path='/vendor-ledger' element={<VendorLedger />} />
+        <Route path='/outstanding' element={<Outstanding />} />
       </Route>
     </Routes>
   );

@@ -345,6 +345,9 @@ const Navbarfrist = () => {
 
           {/*Outstanding*/}
           <div className='dropdown mt-2'>
+            <Link to='/outstanding' style={navLinkStyle("/outstanding")}>
+              <FiLayers /> Outstanding <FiChevronDown size={12} />
+            </Link>
             <button
               onClick={() => toggleDropdown("outstanding")}
               className='btn  text-white w-100 text-start d-flex align-items-center gap-2'
