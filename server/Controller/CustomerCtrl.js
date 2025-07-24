@@ -66,3 +66,15 @@ exports.deleteCustomer = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+// Beat fetch
+exports.getAllBeats = async (req, res) => {
+  try {
+    const beats = await Customer.find().select("area");
+    console.log(beats);
+
+    res.json(beats);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};

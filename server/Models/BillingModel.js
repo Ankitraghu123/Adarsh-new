@@ -35,9 +35,9 @@ const InvoiceSchema = new mongoose.Schema({
     ref: "Customer",
     required: true,
   },
-  salesmanName: String, // ✅ top level
+  salesmanName: String,
 
-  customerName: String, // ✅ top level
+  customerName: String,
   customer: CustomerInfoSchema, // ✅ Embedded
   billingType: { type: String, enum: ["Cash", "Credit"], required: true },
 
@@ -74,7 +74,6 @@ const InvoiceSchema = new mongoose.Schema({
   ],
 
   ledgerIds: [{ type: mongoose.Schema.Types.ObjectId, ref: "Ledger" }],
-
   createdAt: { type: Date, default: Date.now },
 });
 

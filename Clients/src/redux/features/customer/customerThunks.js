@@ -77,3 +77,17 @@ export const deleteCustomer = createAsyncThunk(
     }
   }
 );
+// get all beats a customer
+
+// ✅ Thunk to fetch all areas
+export const getAllBeats = createAsyncThunk(
+  "areas/getAllBeats",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axios.get("/customer/beats"); // <-- yaha tera route hai
+      return response.data;
+    } catch (err) {
+      return rejectWithValue(err.response.data || err.message);
+    }
+  }
+);

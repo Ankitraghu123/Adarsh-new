@@ -6,11 +6,13 @@ import {
   createCustomer,
   updateCustomer,
   deleteCustomer,
+  getAllBeats,
 } from "./customerThunks";
 
 const initialState = {
   customers: [],
   customer: null,
+  beats: [],
   loading: false,
   error: null,
 };
@@ -28,6 +30,19 @@ const customerSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      // 🔹 FETCH ALL CUSTOMERS
+      .addCase(getAllBeats.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getAllBeats.fulfilled, (state, action) => {
+        state.loading = false;
+        state.beats = action.payload;
+      })
+      .addCase(getAllBeats.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || "Failed to fetch customers";
+      })
       // 🔹 FETCH ALL CUSTOMERS
       .addCase(fetchCustomers.pending, (state) => {
         state.loading = true;

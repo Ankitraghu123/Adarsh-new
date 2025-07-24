@@ -22,7 +22,7 @@ function BillingReport() {
 
   const [originalInvoice, setOriginalInvoice] = useState(null);
 
-  console.log(originalInvoice, "Original data");
+  // console.log(originalInvoice, "Original data");
 
   const [loading, setLoading] = useState(false);
 
