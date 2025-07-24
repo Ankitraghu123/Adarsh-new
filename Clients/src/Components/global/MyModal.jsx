@@ -6,7 +6,12 @@ import {
   FaBell,
   FaEnvelope,
   FaSignOutAlt,
+  FaBeer,
+  FaFileInvoiceDollar,
 } from "react-icons/fa";
+
+import { AiFillExclamationCircle } from "react-icons/ai";
+import { Link } from "react-router-dom";
 
 const MyModal = () => {
   const { isOpen, closeModal } = useModal();
@@ -18,11 +23,28 @@ const MyModal = () => {
       <div style={styles.modal}>
         <h2>Quick Actions</h2>
         <div style={styles.iconContainer}>
+          <Link style={{ textDecoration: "none", color: "inherit" }} to={"/"}>
+            <div style={styles.iconItem}>
+              <FaHome size={32} />
+              <span>Home</span>
+            </div>
+          </Link>
+          <Link
+            style={{ textDecoration: "none", color: "inherit" }}
+            to={"/outstanding"}
+          >
+            <div style={styles.iconItem}>
+              <AiFillExclamationCircle size={32} />
+              <span>OutStanding</span>
+            </div>
+          </Link>
+
           <div style={styles.iconItem}>
-            <FaHome size={32} />
-            <span>Home</span>
+            <FaSignOutAlt size={32} />
+            <span>Logout</span>
           </div>
-          <div style={styles.iconItem}>
+
+          {/* <div style={styles.iconItem}>
             <FaUser size={32} />
             <span>Profile</span>
           </div>
@@ -37,11 +59,7 @@ const MyModal = () => {
           <div style={styles.iconItem}>
             <FaEnvelope size={32} />
             <span>Messages</span>
-          </div>
-          <div style={styles.iconItem}>
-            <FaSignOutAlt size={32} />
-            <span>Logout</span>
-          </div>
+          </div> */}
         </div>
         <button onClick={closeModal}>Close</button>
       </div>
