@@ -82,7 +82,11 @@ const CustomerForm = () => {
       setShowPendingModal(true);
     }
   }, [vendorBills, showBillModal, pendingRowIndex]);
+// Foucus on date input when components load 
 
+useEffect(() => {
+  formRefs.current[2]?.focus();
+})
   const handleKeyDown = (e, index) => {
     if (e.key === "ArrowDown" || e.key === "Enter") {
       e.preventDefault();
@@ -170,9 +174,10 @@ const CustomerForm = () => {
     dispatch(fetchInvoicesByCustomer(customer._id));
     setShowModal(false);
 
-    // setTimeout(() => {
-    //   formRefs.current[4]?.focus();
-    // }, 100);
+    // added a slight delay to ensure ui updates before navigating
+    setTimeout(() => {
+      formRefs.current[4]?.focus();
+    }, 200);
   };
 
   useEffect(() => {
