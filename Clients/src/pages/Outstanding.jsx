@@ -96,8 +96,6 @@ const Outstanding = () => {
 
   const beats = useSelector((s) => s?.customer?.beats);
 
-  // console.log(beats);
-
   const dispatch = useDispatch();
 
   useEffect(() => {

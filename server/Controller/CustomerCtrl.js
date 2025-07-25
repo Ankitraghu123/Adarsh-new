@@ -71,7 +71,7 @@ exports.deleteCustomer = async (req, res) => {
 exports.getAllBeats = async (req, res) => {
   try {
     const beats = await Customer.find().select("area");
-    console.log(beats);
+    // console.log(beats);
 
     res.json(beats);
   } catch (err) {
