@@ -2,7 +2,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "../../../Config/axios";
 
-const API_URL = "/api/salesman";
+const API_URL = "/salesman";
 
 // ➕ Create Salesman
 export const createSalesman = createAsyncThunk(

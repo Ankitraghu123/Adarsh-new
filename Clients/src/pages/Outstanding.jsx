@@ -1,191 +1,168 @@
-import React, { useEffect, useState } from "react";
+import dayjs from "dayjs";
+import React, { useState, useEffect } from "react";
 import { Table } from "react-bootstrap";
-import FilterModal from "./outstanding/FilterModal"; // adjust the path as needed
+import FilterModal from "./outstanding/FilterModal";
+import NameSelectModal from "./outstanding/NameSelectModals";
 import { useDispatch, useSelector } from "react-redux";
-import { getAllBeats } from "../redux/features/customer/customerThunks";
 
-const tableData = [
-  {
-    invoice: "1/A000161",
-    date: "21-06-25",
-    partyName: "BOMBAY MEDICAL",
-    billValue: "32885.00",
-    paid: "26000.00",
-    balance: "6885.00",
-    day: "27",
-  },
-  {
-    invoice: "2/A000233",
-    date: "28-06-25",
-    partyName: "KIRTI MEDICAL",
-    billValue: "1252.00",
-    paid: "0.00",
-    balance: "1252.00",
-    day: "20",
-  },
-  {
-    invoice: "3/A000234",
-    date: "28-06-25",
-    partyName: "SMASITIK SUPER SALES",
-    billValue: "1894.00",
-    paid: "1000.00",
-    balance: "894.00",
-    day: "20",
-  },
-  {
-    invoice: "4/A000235",
-    date: "28-06-25",
-    partyName: "VIVEK PROTEINS",
-    billValue: "920.00",
-    paid: "300.00",
-    balance: "620.00",
-    day: "20",
-  },
-  {
-    invoice: "5/A000236",
-    date: "28-06-25",
-    partyName: "AMIT KIRAN",
-    billValue: "1287.00",
-    paid: "0.00",
-    balance: "1287.00",
-    day: "20",
-  },
-  {
-    invoice: "6/A000238",
-    date: "28-06-25",
-    partyName: "APPU TRADERS",
-    billValue: "1688.00",
-    paid: "0.00",
-    balance: "1688.00",
-    day: "20",
-  },
-  {
-    invoice: "7/A000239",
-    date: "28-06-25",
-    partyName: "SHIV SHANKAR KIRANA",
-    billValue: "889.00",
-    paid: "0.00",
-    balance: "889.00",
-    day: "20",
-  },
-  {
-    invoice: "8/A000240",
-    date: "28-06-25",
-    partyName: "RAJSHRI KIRANA (A.G)",
-    billValue: "3675.00",
-    paid: "1500.00",
-    balance: "2175.00",
-    day: "20",
-  },
-  {
-    invoice: "9/A000242",
-    date: "28-06-25",
-    partyName: "VIDANT KIRANA",
-    billValue: "5838.00",
-    paid: "0.00",
-    balance: "5838.00",
-    day: "20",
-  },
-];
+import { getAllBeats } from "../redux/features/customer/customerThunks";
+import { fetchSalesmen } from "../redux/features/salesMan/salesManThunks";
+import { fetchInvoicesBySalesman } from "../redux/features/product-bill/invoiceThunks";
 
 const Outstanding = () => {
-  const [showModal, setShowModal] = useState(true);
-  const [selectedCustomer, setSelectedCustomer] = useState("");
+  const [showFilterModal, setShowFilterModal] = useState(true);
+  const [showNameModal, setShowNameModal] = useState(false);
+
+  const [selectedType, setSelectedType] = useState("");
+  const [selectedName, setSelectedName] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
 
-  const beats = useSelector((s) => s?.customer?.beats);
+  const { invoices, totalPendingAmount, count } = useSelector(
+    (s) => s?.invoice?.invoicesBySalesman || []
+  );
+  const areaWise = useSelector((s) => s?.invoice?.areaWise || []);
 
-  // console.log(beats);
+  const tableData =
+    selectedType === "mrwise"
+      ? invoices
+      : selectedType === "areawise"
+      ? areaWise.length > 0
+        ? areaWise
+        : [
+            {
+              invoice: "DUMMY/AREA001",
+              date: "21-07-25",
+              partyName: "DEMO AREA PARTY",
+              billValue: "12345.00",
+              paid: "10000.00",
+              balance: "2345.00",
+              day: "15",
+            },
+          ]
+      : [];
 
   const dispatch = useDispatch();
 
+  // console.log(endDate, "OOo");
+
   useEffect(() => {
     dispatch(getAllBeats());
+    dispatch(fetchSalesmen());
   }, []);
 
-  const handleModalSubmit = (e) => {
+  const handleFilterSubmit = (e) => {
     e.preventDefault();
-    if (selectedCustomer && startDate && endDate) {
-      setShowModal(false);
+    if (selectedType) {
+      setShowFilterModal(false);
+      setShowNameModal(true);
     } else {
-      alert("Please fill in all fields.");
+      alert("Please select Type.");
     }
   };
 
-  const totalBillValue = tableData
-    .reduce((acc, row) => acc + Number(row.billValue), 0)
-    .toFixed(2);
+  const handleNameSubmit = (e) => {
+    e.preventDefault();
+    if (selectedName?.id) {
+      dispatch(fetchInvoicesBySalesman(selectedName.id));
+      setShowNameModal(false);
+    } else {
+      alert("Please select a name.");
+    }
+  };
+
+  const totalBillValue = totalPendingAmount?.toFixed(2);
 
   return (
-    <div className='p-3' style={{ fontFamily: "Arial, sans-serif" }}>
+    <div className='p-3'>
       <FilterModal
-        show={showModal}
-        onHide={() => setShowModal(false)}
-        onSubmit={handleModalSubmit}
-        selectedCustomer={selectedCustomer}
-        setSelectedCustomer={setSelectedCustomer}
+        show={showFilterModal}
+        onHide={() => setShowFilterModal(false)}
+        onSubmit={handleFilterSubmit}
+        selectedType={selectedType}
+        setSelectedType={setSelectedType}
         startDate={startDate}
         setStartDate={setStartDate}
         endDate={endDate}
         setEndDate={setEndDate}
       />
 
-      {!showModal && (
+      <NameSelectModal
+        show={showNameModal}
+        onHide={() => {
+          setShowNameModal(false);
+          setShowFilterModal(true);
+        }}
+        onSubmit={handleNameSubmit}
+        selectedType={selectedType}
+        selectedName={selectedName}
+        setSelectedName={setSelectedName}
+      />
+
+      {!showFilterModal && !showNameModal && (
         <>
-          <h5
-            className='text-center fw-bold mb-0 py-2'
-            style={{ border: "2px solid rgba(8, 98, 255, 0.873)" }}
-          >
+          <h5 className='text-center fw-bold mb-0 py-2'>
             SAMRIDHI ENTERPRISES
           </h5>
-          <h3
-            className='text-center fw-bold mb-0 py-2'
-            style={{ border: "1px solid rgba(8, 98, 255, 0.873)" }}
-          >
-            {selectedCustomer.toUpperCase()} OUTSTANDING AS ON 18-07-2025
+          <h3 className='text-center fw-bold mb-0 py-2'>
+            {selectedName?.name?.toUpperCase()} OUTSTANDING{" "}
+            {startDate && endDate
+              ? `FROM ${new Date(startDate).toLocaleDateString(
+                  "en-GB"
+                )} TO ${new Date(endDate).toLocaleDateString("en-GB")}`
+              : startDate
+              ? `FROM ${new Date(startDate).toLocaleDateString("en-GB")}`
+              : endDate
+              ? `TO ${new Date(endDate).toLocaleDateString("en-GB")}`
+              : ""}
           </h3>
 
-          <Table
-            bordered
-            responsive
-            className='mb-0'
-            style={{ fontSize: "14px" }}
-          >
+          <Table bordered responsive>
             <thead>
               <tr className='text-center fw-bold'>
                 <th colSpan={1}>TOTAL NO.</th>
-                <th colSpan={2}>BILLS : {tableData.length}</th>
-                <th colSpan={2}>GRAND TOTAL :</th>
+                <th colSpan={2}>BILLS : {count}</th>
+                <th colSpan={2}>GRAND TOTAL : </th>
                 <th>{totalBillValue}</th>
                 <th colSpan={4}></th>
               </tr>
               <tr className='text-center border'>
-                <th style={{ width: "8%" }}>Sr No.</th>
-                <th style={{ width: "8%" }}>INVOICE</th>
-                <th style={{ width: "8%" }}>DATE</th>
+                <th>Sr No.</th>
+                {selectedType !== "mrwise" && <th>INVOICE</th>}
+                <th>DATE</th>
                 <th>PARTY NAME</th>
-                <th style={{ width: "10%" }}>BILL VALUE</th>
-                <th style={{ width: "10%" }}>PAID</th>
-                <th style={{ width: "10%" }}>BALANCE</th>
-                <th style={{ width: "5%" }}>DAY</th>
-                <th style={{ width: "12%" }}>REMARK</th>
+                <th>BILL VALUE</th>
+                <th>PAID</th>
+                <th>BALANCE</th>
+                <th>DAY</th>
+                <th>REMARK</th>
+                <th>REMARK</th>
               </tr>
             </thead>
             <tbody>
-              {tableData.map((row, index) => (
-                <tr key={index} className='text-center'>
-                  <td style={{ textAlign: "right" }}>{index + 1}</td>
-                  <td style={{ textAlign: "left" }}>{row.invoice}</td>
-                  <td style={{ textAlign: "left" }}>{row.date}</td>
-                  <td style={{ textAlign: "left" }}>{row.partyName}</td>
-                  <td style={{ textAlign: "right" }}>{row.billValue}</td>
-                  <td style={{ textAlign: "right" }}>{row.paid}</td>
-                  <td style={{ textAlign: "right" }}>{row.balance}</td>
-                  <td style={{ textAlign: "right" }}>{row.day}</td>
-                  <td></td>
-                </tr>
-              ))}
+              {tableData &&
+                tableData.map((row, index) => (
+                  <tr key={index} className='text-center'>
+                    <td>{index + 1}</td>
+                    {selectedType !== "mrwise" && <td>{row.invoice}</td>}
+                    <td>{dayjs(row.billDate).format("DD-MM-YYYY")}</td>
+
+                    <td>{row.customerName}</td>
+                    <td>{row.billValue}</td>
+                    <td>{row.paid}</td>
+                    <td>{row.pendingAmount}</td>
+                    <td
+                      style={{
+                        color: row.daysPending > 30 ? "red" : "inherit",
+                        fontWeight: row.daysPending > 30 ? "bold" : "normal",
+                      }}
+                    >
+                      {row.daysPending}
+                    </td>
+                    <td></td>
+                    <td></td>
+                  </tr>
+                ))}
             </tbody>
           </Table>
         </>

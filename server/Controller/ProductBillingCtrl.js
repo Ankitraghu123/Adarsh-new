@@ -355,7 +355,7 @@ const getInvoicesByCustomer = async (req, res) => {
 
 const getBalanceByCustomer = async (req, res) => {
   try {
-    console.log(req.params, "➡️ Get Balance by Customer");
+    // console.log(req.params, "➡️ Get Balance by Customer");
 
     const { customerId } = req.params;
 
@@ -603,6 +603,146 @@ const applyNewRef = async (req, res) => {
   }
 };
 
+// ✅ GET /api/invoices/by-salesman/:salesmanId
+
+// const getInvoicesBySalesman = async (req, res) => {
+//   try {
+//     const { salesmanId } = req.params;
+
+//     if (!salesmanId) {
+//       return res.status(400).json({ message: "Salesman ID is required" });
+//     }
+
+//     const result = await Invoice.aggregate([
+//       {
+//         $match: {
+//           $or: [
+//             { salesmanId: new mongoose.Types.ObjectId(salesmanId) },
+//             {
+//               "customer.selectedSalesmanId": new mongoose.Types.ObjectId(
+//                 salesmanId
+//               ),
+//             },
+//           ],
+//         },
+//       },
+//       {
+//         $addFields: {
+//           daysPending: {
+//             $dateDiff: {
+//               startDate: {
+//                 $ifNull: [
+//                   "$customer.Billdate",
+//                   { $ifNull: ["$billDate", "$createdAt"] },
+//                 ],
+//               },
+//               endDate: "$$NOW",
+//               unit: "day",
+//             },
+//           },
+//         },
+//       },
+//       {
+//         $group: {
+//           _id: null,
+//           totalPendingAmount: { $sum: "$pendingAmount" },
+//           invoices: { $push: "$$ROOT" },
+//         },
+//       },
+//     ]);
+
+//     if (!result.length) {
+//       return res.status(404).json({
+//         message: `No invoices found for salesman ID '${salesmanId}'`,
+//       });
+//     }
+
+//     const { totalPendingAmount, invoices } = result[0];
+
+//     res.status(200).json({
+//       message: "Invoices fetched successfully",
+//       count: invoices.length,
+//       totalPendingAmount,
+//       invoices,
+//     });
+//   } catch (error) {
+//     console.error("[getInvoicesBySalesman] Error:", error);
+//     res.status(500).json({
+//       error: "Failed to fetch salesman invoices",
+//       details: error.message,
+//     });
+//   }
+// };
+
+const getInvoicesBySalesman = async (req, res) => {
+  try {
+    const { salesmanId } = req.params;
+
+    if (!salesmanId) {
+      return res.status(400).json({ message: "Salesman ID is required" });
+    }
+
+    const result = await Invoice.aggregate([
+      {
+        $match: {
+          $and: [
+            {
+              $or: [
+                { salesmanId: new mongoose.Types.ObjectId(salesmanId) },
+                {
+                  "customer.selectedSalesmanId": new mongoose.Types.ObjectId(
+                    salesmanId
+                  ),
+                },
+              ],
+            },
+            {
+              pendingAmount: { $gt: 0 }, // ✅ ONLY pendingAmount > 0
+            },
+          ],
+        },
+      },
+      {
+        $addFields: {
+          daysPending: {
+            $dateDiff: {
+              startDate: "$billDate",
+              endDate: "$$NOW",
+              unit: "day",
+            },
+          },
+        },
+      },
+      { $sort: { createdAt: -1 } },
+    ]);
+
+    if (!result || result.length === 0) {
+      return res.status(404).json({
+        message: `No invoices found for salesman ID '${salesmanId}'`,
+      });
+    }
+
+    // ✅ Total pending amount sum
+    const totalPendingAmount = result.reduce(
+      (acc, invoice) => acc + Number(invoice.pendingAmount || 0),
+      0
+    );
+
+    res.status(200).json({
+      message: "Invoices fetched successfully",
+      count: result.length,
+      totalPendingAmount,
+      invoices: result,
+    });
+  } catch (error) {
+    console.error("[getInvoicesBySalesman] Error:", error);
+    res.status(500).json({
+      error: "Failed to fetch salesman invoices",
+      details: error.message,
+    });
+  }
+};
+
 module.exports = {
   createBilling,
   getAllInvoices,
@@ -613,4 +753,5 @@ module.exports = {
   adjustNewRef,
   updateBilling,
   applyNewRef,
+  getInvoicesBySalesman,
 };
