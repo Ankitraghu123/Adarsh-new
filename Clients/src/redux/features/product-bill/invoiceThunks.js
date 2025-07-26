@@ -104,3 +104,15 @@ export const fetchBalanceByCustomer = createAsyncThunk(
     }
   }
 );
+
+export const fetchInvoicesBySalesman = createAsyncThunk(
+  "salesmanInvoices/fetchBySalesman",
+  async (salesmanId, { rejectWithValue }) => {
+    try {
+      const res = await axios.get(`${API_URL}/by-salesman/${salesmanId}`);
+      return res.data; // backend response me `invoices` array hai
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || err.message);
+    }
+  }
+);

@@ -67,12 +67,15 @@ exports.deleteCustomer = async (req, res) => {
   }
 };
 
-// Beat fetch
 exports.getAllBeats = async (req, res) => {
   try {
-    const beats = await Customer.find().select("area");
-    // console.log(beats);
-
+    const beats = await Customer.aggregate([
+      {
+        $group: {
+          _id: "$area",
+        },
+      },
+    ]);
     res.json(beats);
   } catch (err) {
     res.status(500).json({ error: err.message });
