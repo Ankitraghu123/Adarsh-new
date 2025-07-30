@@ -22,7 +22,18 @@ const PurchaseForm = ({ idToEdit }) => {
 
   const [editingId, setEditingId] = useState(null);
   const [loading, setLoading] = useState(false);
+  // to get focus on the select vendor 
 
+  const vendorRef = useRef(null);
+useEffect(() => {
+  if (!loading && vendors.length > 0) {
+    setTimeout(() => {
+      vendorRef.current?.focus();
+    }, 100);
+  }
+}, [loading, vendors]);
+
+//--------- to get focus on the vendor
   const [showProductModal, setShowProductModal] = useState(false);
 
   const brandRef = useRef(null);
@@ -677,6 +688,7 @@ const PurchaseForm = ({ idToEdit }) => {
                 />
 
                 <div
+                ref={vendorRef}
                   tabIndex={0}
                   className='form-select'
                   style={{
