@@ -10,6 +10,16 @@ body {
 }
 
 
+/* Add this to your CSS or a relevant CSS/SCSS file */
+.disabled-row {
+  background-color: #f2f2f2;
+  /* light gray background */
+  color: #999;
+  /* lighter text */
+  cursor: not-allowed;
+  pointer-events: none;
+  /* makes sure clicks don’t trigger accidentally */
+}
 
 
 
@@ -18,8 +28,10 @@ body {
 .sidebar .btn:focus,
 .sidebar a:focus {
   outline: none;
-  box-shadow: 0 0 0 3px #ffffff; /* White border glow */
-  border-radius: 4px; /* Rounded corners for a clean look */
+  box-shadow: 0 0 0 3px #ffffff;
+  /* White border glow */
+  border-radius: 4px;
+  /* Rounded corners for a clean look */
 }
 
 .sidebar .btn:focus-visible,
@@ -514,17 +526,18 @@ table th {
 
 #new-tabl {
   border-top: none !important;
-   border: 3px solid rgba(8, 98, 255, 0.873);
+  border: 3px solid rgba(8, 98, 255, 0.873);
 }
 
-#new-table th{
+#new-table th {
   border: 1px solid rgba(8, 98, 255, 0.873);
 }
 
-#new-tabl th{
+#new-tabl th {
   border: 1px solid rgba(8, 98, 255, 0.873);
 }
-#new-table1 td{
+
+#new-table1 td {
   border: 1px solid rgba(8, 98, 255, 0.873);
 }
 

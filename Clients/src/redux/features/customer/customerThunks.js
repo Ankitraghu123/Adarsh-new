@@ -84,8 +84,8 @@ export const getAllBeats = createAsyncThunk(
   "areas/getAllBeats",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get("/customer/beats"); // <-- yaha tera route hai
-      return response.data;
+      const response = await axios.get("/salesman/beats"); // <-- yaha tera route hai
+      return response.data.beats;
     } catch (err) {
       return rejectWithValue(err.response.data || err.message);
     }

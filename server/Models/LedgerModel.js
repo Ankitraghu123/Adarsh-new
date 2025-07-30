@@ -5,7 +5,7 @@ const vendorLedgerSchema = new mongoose.Schema({
   voucherNumber: {
     type: String,
     unique: true,
-    required: true,
+    // required: true,
   },
 
   refType: {
@@ -76,7 +76,7 @@ const vendorLedgerSchema = new mongoose.Schema({
 vendorLedgerSchema.pre("save", async function (next) {
   if (!this.voucherNumber) {
     try {
-      const VendorLedger = mongoose.model("VendorLedger");
+      const VendorLedger = mongoose.model("Ledger");
       const lastEntry = await VendorLedger.findOne().sort({ createdAt: -1 });
 
       let nextNumber = 1;

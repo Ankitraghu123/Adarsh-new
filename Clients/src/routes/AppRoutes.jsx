@@ -28,7 +28,7 @@ import CustomerForm from "../pages/customer-reciept/CustomerForm";
 import VendorLedger from "../Components/payment/vendorLedger";
 
 import Outstanding from "../pages/Outstanding";
-
+import PurchaseTabs from "../pages/PurchaseTabs";
 
 const AppRoutes = () => {
   return (
@@ -49,10 +49,8 @@ const AppRoutes = () => {
         <Route path='/display-invoice' element={<DisplayInvoice />} />
         <Route path='/generate-invoice/:id' element={<GenerateInvoice />} />
         <Route path='/Vendor-report' element={<VendorReport />} />
-        <Route path='/purchase' element={<PurchaseForm />} />
+        <Route path='/purchase' element={<PurchaseTabs />} />
         <Route path='/add-customer' element={<CustomerDetail />} />
-      
-
 
         <Route path='/test' element={<PaymentVoucherForm />} />
         <Route path='/report' element={<CustomerForm />} />

@@ -1,36 +1,25 @@
 import React, { useEffect, useState, useRef } from "react";
-import {
-  Container,
-  Row,
-  Col,
-  Form,
-  Button,
-  Card,
-  Table,
-  Modal,
-} from "react-bootstrap";
-import axios from "../../Config/axios";
-import Loader from "../Loader";
+import { Row, Col, Form, Button, Card, Table, Modal } from "react-bootstrap";
 import toast from "react-hot-toast";
 import { BsPlusCircle, BsTrash } from "react-icons/bs";
-import OverlayTrigger from "react-bootstrap/OverlayTrigger";
-import Tooltip from "react-bootstrap/Tooltip";
-
 import { MdModeEdit, MdOutlineKeyboardHide } from "react-icons/md";
 
-import { confirmAlert } from "react-confirm-alert";
-import Product from "../Productss/CreateProduct/Product";
+import Loader from "../Loader";
+import axios from "../../Config/axios";
 import axiosInstance from "../../Config/axios";
-import dayjs from "dayjs";
 
+import Product from "../Productss/CreateProduct/Product";
 import useSearchableModal from "../../Components/SearchableModal";
-import CustomDataTable from "../CustomDataTable";
 
-const PurchaseForm = () => {
+import ProductModel from "./purchaseModel/ProductModel";
+import BrandModels from "./purchaseModel/BrandModels";
+import VendorModal from "./purchaseModel/VendorModel";
+
+const PurchaseForm = ({ idToEdit }) => {
   const [vendors, setVendors] = useState([]);
   const [companies, setCompanies] = useState([]);
   const [products, setProducts] = useState([]);
-  const [purchases, setPurchases] = useState([]);
+
   const [editingId, setEditingId] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -106,16 +95,14 @@ const PurchaseForm = () => {
   const fetchInitialData = async () => {
     setLoading(true);
     try {
-      const [vRes, cRes, pRes, purRes] = await Promise.all([
+      const [vRes, cRes, pRes] = await Promise.all([
         axios.get("/vendor"),
         axios.get("/company"),
         axios.get("/product"),
-        axios.get("/purchase"),
       ]);
       setVendors(vRes.data);
       setCompanies(cRes.data);
       setProducts(pRes.data || []);
-      setPurchases(purRes.data || []);
 
       setPurchaseData((prev) => ({
         ...prev,
@@ -226,7 +213,8 @@ const PurchaseForm = () => {
       ...prev,
       item: {
         productId: "",
-        companyId: "",
+        // companyId: "",
+        companyId: prev.companyId, // ✅ SAME brand dubara
         quantity: "",
         availableQty: "",
         purchaseRate: "",
@@ -301,37 +289,6 @@ const PurchaseForm = () => {
     }
   };
 
-  const handleDelete = async (id) => {
-    confirmAlert({
-      title: "Confirm Delete",
-      message: "Are you sure you want to delete this purchase?",
-      buttons: [
-        {
-          label: "Yes",
-          onClick: async () => {
-            try {
-              setLoading(true);
-              await axios.delete(`/purchase/${id}`);
-              toast.success("Purchase deleted successfully.");
-              fetchInitialData();
-            } catch (err) {
-              console.error("Error deleting purchase:", err);
-              toast.error("Failed to delete purchase.");
-            } finally {
-              setLoading(false);
-            }
-          },
-        },
-        {
-          label: "No",
-          onClick: () => {
-            // do nothing
-          },
-        },
-      ],
-    });
-  };
-
   const removeItem = (index) => {
     setItemsList((prev) => prev.filter((_, i) => i !== index));
   };
@@ -355,7 +312,8 @@ const PurchaseForm = () => {
       if (rowFocusable.indexOf(e.target) === rowFocusable.length - 1) {
         addItemToList();
         setTimeout(() => {
-          brandRef.current?.focus(); // Focus back to brand input
+          // brandRef.current?.focus(); // Focus back to brand input
+          productRef.current?.focus(); // ✅ Ab Product pe dobara focus
         }, 100);
       } else {
         const nextIndex = focusable.indexOf(e.target) + 1;
@@ -441,37 +399,6 @@ const PurchaseForm = () => {
     setEditItemIndex(index); // mark the index being edited
   };
 
-  const handleEditPurchase = (purchase) => {
-    // Set the main purchase form fields for editing
-    setPurchaseData({
-      entryNumber: purchase.entryNumber,
-      partyNo: purchase.partyNo,
-      vendorId: purchase.vendorId?._id || "",
-      date: dayjs(purchase.date).format("YYYY-MM-DD"),
-      item: {
-        // Reset item fields when loading a new purchase for editing
-        productId: "",
-        quantity: "",
-        purchaseRate: "",
-        availableQty: "",
-        totalAmount: "",
-        discountPercent: "0",
-        schemePercent: "0",
-      },
-    });
-
-    // Prefill the items list with the purchase's existing items
-    setItemsList(
-      purchase.items.map((item) => ({
-        ...item,
-        productId: item.productId._id, // Ensure it's just the ID
-        companyId: item.companyId._id, // Ensure it's just the ID
-      }))
-    );
-    setEditingId(purchase._id); // ✅ THIS IS CRUCIAL: Set the ID of the purchase being edited
-    setEditItemIndex(null); // Ensure no individual item is in edit mode when starting a purchase edit
-  };
-
   // !model
   const {
     showModal: showVendorModal,
@@ -516,7 +443,8 @@ const PurchaseForm = () => {
     if (e.key === "Enter") {
       e.preventDefault();
       if (e.target.name === "partyNo") {
-        brandRef.current?.focus();
+        // brandRef.current?.focus();
+        productRef.current?.focus();
         return;
       }
       const nextIndex =
@@ -693,85 +621,38 @@ const PurchaseForm = () => {
     };
   }, [handleSubmit]);
 
-  const getPurchaseColumns = (handleEditPurchase, handleDelete) => [
-    {
-      name: "SR",
-      selector: (row, index) => index + 1,
-      sortable: true,
-      width: "70px",
-    },
-    {
-      name: "Entry No.",
-      selector: (row) => row.entryNumber,
-      sortable: true,
-    },
-    {
-      name: "Party No.",
-      selector: (row) => row.partyNo,
-      sortable: true,
-    },
-    {
-      name: "Vendor",
-      selector: (row) => row.vendorId?.name || "-",
-      sortable: true,
-    },
-    {
-      name: "Items Count",
-      selector: (row) => row.items?.length || 0,
-      sortable: false,
-    },
-    {
-      name: "Item Quantity",
-      selector: (row) =>
-        row.items?.map((i, idx) => (
-          <div key={idx}>
-            {i.productId?.productName}: {i.quantity}
-          </div>
-        )),
-      wrap: true,
-    },
-    {
-      name: "Item Rate",
-      selector: (row) =>
-        row.items?.map((i, idx) => <div key={idx}>₹{i.purchaseRate}</div>),
-      wrap: true,
-    },
-    {
-      name: "Total Amount",
-      selector: (row) =>
-        row.items?.map((i, idx) => <div key={idx}>₹{i.totalAmount}</div>),
-      wrap: true,
-    },
-    {
-      name: "Purchase Date",
-      selector: (row) => dayjs(row.date).format("DD MMM YYYY"),
-      sortable: true,
-    },
-    {
-      name: "Actions",
-      cell: (row) => (
-        <div className='d-flex gap-2'>
-          <Button
-            variant='warning'
-            size='sm'
-            onClick={() => handleEditPurchase(row)}
-          >
-            <MdModeEdit />
-          </Button>
-          <Button
-            variant='danger'
-            size='sm'
-            onClick={() => handleDelete(row._id)}
-          >
-            <BsTrash />
-          </Button>
-        </div>
-      ),
-      ignoreRowClick: true,
-      allowOverflow: true,
-      button: true,
-    },
-  ];
+  useEffect(() => {
+    const fetchPurchaseById = async () => {
+      if (idToEdit) {
+        const { data } = await axiosInstance.get(`/purchase/${idToEdit}`);
+        setPurchaseData({
+          vendorId: data.vendorId?._id,
+          entryNumber: data.entryNumber,
+          partyNo: data.partyNo,
+          date: dayjs(data.date).format("YYYY-MM-DD"),
+          item: {
+            productId: "",
+            companyId: "",
+            purchaseRate: "",
+            quantity: "",
+            availableQty: "",
+            totalAmount: "",
+            discountPercent: "0",
+            schemePercent: "0",
+          },
+        });
+        setItemsList(
+          data.items.map((item) => ({
+            ...item,
+            productId: item.productId._id,
+            companyId: item.companyId._id,
+          }))
+        );
+        setEditingId(data._id);
+      }
+    };
+    fetchPurchaseById();
+  }, [idToEdit]);
 
   if (loading) {
     return <Loader />;
@@ -780,7 +661,7 @@ const PurchaseForm = () => {
   return (
     <div className='mx-5'>
       <Card className='p-4 mb-4'>
-        <h4 className='mb-3'>{editingId ? "Edit Purchase" : "Add Purchase"}</h4>
+        <h4 className='mb-3'>{idToEdit ? "Edit Purchase" : "Add Purchase"}</h4>
         <Form onSubmit={handleSubmit}>
           {/* Vendor and Date */}
           <Row className='mb-3 d-flex justify-content-between align-items-end'>
@@ -848,6 +729,28 @@ const PurchaseForm = () => {
               </Form.Group>
             </Col>
 
+            <Col md='auto'>
+              <Form.Group>
+                <Form.Label>Brand</Form.Label>
+
+                <Form.Control
+                  type='text'
+                  name='brand'
+                  value={
+                    companies.find((c) => c._id === purchaseData.item.companyId)
+                      ?.name || ""
+                  }
+                  onFocus={() => brandModal.setShowModal(true)}
+                  onKeyDown={handleFormNav} // ✅ Yeh line add karo
+                  // ref={brandRef} // 👈 add this
+                  readOnly
+                  data-nav
+                  placeholder='Select Brand'
+                  className='form-select'
+                />
+              </Form.Group>
+            </Col>
+
             <Col md={3}>
               <Form.Group>
                 <Form.Label>Party No.</Form.Label>
@@ -855,6 +758,7 @@ const PurchaseForm = () => {
                   type='text'
                   name='partyNo'
                   onKeyDown={handleFormNav}
+                  ref={brandRef} // ✅ Yahin lagao
                   value={purchaseData.partyNo}
                   required
                   onChange={(e) =>
@@ -867,6 +771,7 @@ const PurchaseForm = () => {
               </Form.Group>
             </Col>
           </Row>
+
           {/* Buttons */}
           <Row className='mt-3 d-flex align-items-center justify-content-between flex-wrap'>
             <Col xs={12} md='auto' className='mb-2'>
@@ -905,50 +810,6 @@ const PurchaseForm = () => {
           {/* Item Form */}
           <div style={{ overflowX: "auto" }}>
             <Row className='mb-3 flex-nowrap'>
-              <Col md='auto'>
-                <Form.Group>
-                  <Form.Label>Brand</Form.Label>
-                  {/* <Form.Select
-                    ref={brandRef} // 👈 new ref
-                    name='companyId'
-                    onKeyDown={handleFormNav}
-                    data-nav // 👈 Important
-                    value={purchaseData.item.companyId}
-                    onChange={handleItemChange}
-                    onFocus={(e) => {
-                      // Auto-open dropdown on focus
-                      const event = new KeyboardEvent("keydown", {
-                        key: "ArrowDown",
-                      });
-                      e.target.dispatchEvent(event);
-                    }}
-                  >
-                    <option value=''>Select Company</option>
-                    {companies.map((c) => (
-                      <option key={c._id} value={c._id}>
-                        {c.name}
-                      </option>
-                    ))}
-                  </Form.Select> */}
-                  <Form.Control
-                    type='text'
-                    name='brand'
-                    value={
-                      companies.find(
-                        (c) => c._id === purchaseData.item.companyId
-                      )?.name || ""
-                    }
-                    onFocus={() => brandModal.setShowModal(true)}
-                    onKeyDown={handleFormNav} // ✅ Yeh line add karo
-                    ref={brandRef} // 👈 add this
-                    readOnly
-                    data-nav
-                    placeholder='Select Brand'
-                    className='form-select'
-                  />
-                </Form.Group>
-              </Col>
-
               <Col md='auto'>
                 <Form.Group>
                   <Form.Label>Product</Form.Label>
@@ -1020,7 +881,7 @@ const PurchaseForm = () => {
                 <tr>
                   <th>S.No</th>
                   <th>Product</th>
-                  <th>Company</th>
+                  <th>Brand</th>
                   <th>Qty</th>
                   <th>Rate</th>
                   <th>DIS%</th>
@@ -1091,82 +952,6 @@ const PurchaseForm = () => {
         </Form>
       </Card>
 
-      {/* Purchase List */}
-      <Card className='p-3 mt-4'>
-        <h5>Purchase List</h5>
-        {purchases.length === 0 ? (
-          <p>No purchases found.</p>
-        ) : (
-          <CustomDataTable
-            title=''
-            columns={getPurchaseColumns(handleEditPurchase, handleDelete)}
-            data={purchases}
-            pagination={true}
-            loading={false}
-          />
-
-          /* <Table striped bordered responsive>
-            <thead>
-              <tr>
-                <th>Entry No.</th>
-                <th>Party No.</th>
-                <th>Vendor</th>
-                <th>Items Count</th>
-                <th>Item Quantity</th>
-                <th>Item Rate</th>
-                <th>Total Amount</th>
-                <th>Purchase Date</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {purchases.map((p) => (
-                <tr key={p._id}>
-                  <td>{p.entryNumber}</td>
-                  <td>{p.partyNo}</td>
-                  <td>{p.vendorId?.name}</td>
-                  <td>{p.items.length}</td>
-                  <td>
-                    {p.items.map((i, idx) => (
-                      <div key={idx}>
-                        {i.productId?.productName}: {i.quantity}
-                      </div>
-                    ))}
-                  </td>
-                  <td>
-                    {p.items.map((i, idx) => (
-                      <div key={idx}>₹{i.purchaseRate}</div>
-                    ))}
-                  </td>
-                  <td>
-                    {p.items.map((i, idx) => (
-                      <div key={idx}>₹{i.totalAmount}</div>
-                    ))}
-                  </td>
-                  <td>{dayjs(p.date).format("DD MMM YYYY")}</td>
-                  <td className='d-flex gap-2'>
-                    <Button
-                      variant='warning'
-                      size='sm'
-                      onClick={() => handleEditPurchase(p)}
-                    >
-                      <MdModeEdit />
-                    </Button>
-                    <Button
-                      variant='danger'
-                      size='sm'
-                      onClick={() => handleDelete(p._id)}
-                    >
-                      <BsTrash />
-                    </Button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </Table> */
-        )}
-      </Card>
-
       {/* Product Modal */}
       <Modal
         show={showProductModal}
@@ -1198,483 +983,49 @@ const PurchaseForm = () => {
         </Modal.Body>
       </Modal>
 
-      {showVendorModal && (
-        <div
-          className='modal-overlay'
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            width: "100vw",
-            height: "100vh",
-            backgroundColor: "rgba(0,0,0,0.5)",
-            zIndex: 9999,
-          }}
-          onClick={() => setShowVendorModal(false)}
-        >
-          <div
-            // className='modal-body'
-            // ref={modalRef}
-            // style={{
-            //   width: "80%",
-            //   margin: "5% auto",
-            //   backgroundColor: "white",
-            //   padding: "1rem",
-            //   maxHeight: "80vh",
-            //   overflowY: "auto",
-            // }}
-            // onClick={(e) => e.stopPropagation()}
-            // onKeyDown={(e) => {
-            //   if (e.key === "ArrowDown") {
-            //     e.preventDefault();
-            //     setFocusedIndex((prev) =>
-            //       prev < filteredVendors.length - 1 ? prev + 1 : 0
-            //     );
-            //   }
-            //   if (e.key === "ArrowUp") {
-            //     e.preventDefault();
-            //     setFocusedIndex((prev) =>
-            //       prev > 0 ? prev - 1 : filteredVendors.length - 1
-            //     );
-            //   }
-            //   if (e.key === "Enter" && focusedIndex >= 0) {
-            //     const selected = filteredVendors[focusedIndex];
-            //     setPurchaseData((prev) => ({
-            //       ...prev,
-            //       vendorId: selected._id,
-            //     }));
-            //     setShowVendorModal(false);
+      <VendorModal
+        showModal={showVendorModal}
+        setShowModal={setShowVendorModal}
+        filterText={filterText}
+        setFilterText={setFilterText}
+        focusedIndex={focusedIndex}
+        setFocusedIndex={setFocusedIndex}
+        modalRef={modalRef}
+        inputRef={inputRef}
+        rowRefs={rowRefs}
+        filteredItems={filteredVendors}
+        setPurchaseData={setPurchaseData}
+      />
 
-            //     // Move focus to next input (e.g., date input)
-            //     setTimeout(() => {
-            //       document.querySelector('input[name="date"]')?.focus();
-            //     }, 100);
-            //   }
-            // }}
+      <BrandModels
+        showModal={brandModal.showModal}
+        setShowModal={brandModal.setShowModal}
+        filterText={brandModal.filterText}
+        setFilterText={brandModal.setFilterText}
+        focusedIndex={brandModal.focusedIndex}
+        setFocusedIndex={brandModal.setFocusedIndex}
+        modalRef={brandModal.modalRef}
+        inputRef={brandModal.inputRef}
+        rowRefs={brandModal.rowRefs}
+        filteredItems={brandModal.filteredItems}
+        setPurchaseData={setPurchaseData}
+        brandRef={brandRef}
+      />
 
-            className='modal-body'
-            ref={modalRef}
-            style={{
-              width: "80%",
-              margin: "5% auto",
-              backgroundColor: "white",
-              padding: "1rem",
-              maxHeight: "80vh",
-              overflowY: "auto",
-            }}
-            onClick={(e) => e.stopPropagation()}
-            onKeyDown={(e) => {
-              if (e.key === "ArrowDown") {
-                e.preventDefault();
-                setFocusedIndex((prev) =>
-                  prev < filteredVendors.length - 1 ? prev + 1 : 0
-                );
-              }
-              if (e.key === "ArrowUp") {
-                e.preventDefault();
-                setFocusedIndex((prev) =>
-                  prev > 0 ? prev - 1 : filteredVendors.length - 1
-                );
-              }
-              if (e.key === "Enter" && focusedIndex >= 0) {
-                e.preventDefault();
-                const selected = filteredVendors[focusedIndex];
-                setPurchaseData((prev) => ({
-                  ...prev,
-                  vendorId: selected._id,
-                }));
-                setShowVendorModal(false);
-                // Focus the date input
-                setTimeout(() => {
-                  document.querySelector('input[name="date"]')?.focus();
-                }, 100);
-              }
-              if (e.key === "Escape") {
-                e.preventDefault();
-                setShowVendorModal(false);
-                // Refocus the vendor input
-                setTimeout(() => {
-                  document
-                    .querySelector('div[data-nav][class*="form-select"]')
-                    ?.focus();
-                }, 100);
-              }
-            }}
-          >
-            <input
-              ref={inputRef}
-              className='form-control mb-3'
-              placeholder='Search vendor...'
-              value={filterText}
-              onChange={(e) => {
-                setFilterText(e.target.value);
-                setFocusedIndex(0);
-              }}
-            />
-
-            <table className='table table-hover table-bordered'>
-              <thead className='table-light'>
-                <tr>
-                  <th>Name</th>
-                  <th>Phone</th>
-                  <th>City</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredVendors.map((vendor, idx) => (
-                  <tr
-                    key={vendor._id}
-                    ref={(el) => (rowRefs.current[idx] = el)}
-                    className={idx === focusedIndex ? "table-active" : ""}
-                    onClick={() => {
-                      setPurchaseData((prev) => ({
-                        ...prev,
-                        vendorId: vendor._id,
-                      }));
-                      setShowVendorModal(false);
-                    }}
-                  >
-                    <td>{vendor.name}</td>
-                    <td>{vendor.mobile}</td>
-                    <td>{vendor.city}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
-
-      {brandModal.showModal && (
-        <div
-          className='modal-overlay'
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            width: "100vw",
-            height: "100vh",
-            backgroundColor: "rgba(0,0,0,0.5)",
-            zIndex: 9999,
-          }}
-          onClick={() => brandModal.setShowModal(false)}
-        >
-          <div
-            // className='modal-body'
-            // ref={brandModal.modalRef}
-            // style={{
-            //   width: "80%",
-            //   margin: "5% auto",
-            //   backgroundColor: "white",
-            //   padding: "1rem",
-            //   maxHeight: "80vh",
-            //   overflowY: "auto",
-            // }}
-            // onClick={(e) => e.stopPropagation()}
-            // onKeyDown={(e) => {
-            //   if (e.key === "ArrowDown") {
-            //     e.preventDefault();
-            //     brandModal.setFocusedIndex((prev) =>
-            //       prev < brandModal.filteredItems.length - 1 ? prev + 1 : 0
-            //     );
-            //   }
-            //   if (e.key === "ArrowUp") {
-            //     e.preventDefault();
-            //     brandModal.setFocusedIndex((prev) =>
-            //       prev > 0 ? prev - 1 : brandModal.filteredItems.length - 1
-            //     );
-            //   }
-            //   // if (e.key === "Enter" && brandModal.focusedIndex >= 0) {
-            //   //   const selected =
-            //   //     brandModal.filteredItems[brandModal.focusedIndex];
-            //   //   setPurchaseData((prev) => ({
-            //   //     ...prev,
-            //   //     item: {
-            //   //       ...prev.item,
-            //   //       companyId: selected._id,
-            //   //     },
-            //   //   }));
-            //   //   brandModal.setShowModal(false);
-            //   // }
-            //   if (e.key === "Enter" && brandModal.focusedIndex >= 0) {
-            //     const selected =
-            //       brandModal.filteredItems[brandModal.focusedIndex];
-            //     setPurchaseData((prev) => ({
-            //       ...prev,
-            //       item: {
-            //         ...prev.item,
-            //         companyId: selected._id,
-            //       },
-            //     }));
-            //     brandModal.setShowModal(false);
-
-            //     // ✅ Focus product field after brand select
-            //     setTimeout(() => {
-            //       document.querySelector('input[name="product"]')?.focus();
-            //     }, 100);
-            //   }
-            // }}
-
-            className='modal-body'
-            ref={brandModal.modalRef}
-            style={{
-              width: "80%",
-              margin: "5% auto",
-              backgroundColor: "white",
-              padding: "1rem",
-              maxHeight: "80vh",
-              overflowY: "auto",
-            }}
-            onClick={(e) => e.stopPropagation()}
-            onKeyDown={(e) => {
-              if (e.key === "ArrowDown") {
-                e.preventDefault();
-                brandModal.setFocusedIndex((prev) =>
-                  prev < brandModal.filteredItems.length - 1 ? prev + 1 : 0
-                );
-              }
-              if (e.key === "ArrowUp") {
-                e.preventDefault();
-                brandModal.setFocusedIndex((prev) =>
-                  prev > 0 ? prev - 1 : brandModal.filteredItems.length - 1
-                );
-              }
-              if (e.key === "Enter" && brandModal.focusedIndex >= 0) {
-                e.preventDefault();
-                const selected =
-                  brandModal.filteredItems[brandModal.focusedIndex];
-                setPurchaseData((prev) => ({
-                  ...prev,
-                  item: {
-                    ...prev.item,
-                    companyId: selected._id,
-                  },
-                }));
-                brandModal.setShowModal(false);
-                // Focus the product input
-                setTimeout(() => {
-                  productRef.current?.focus();
-                }, 100);
-              }
-              if (e.key === "Escape") {
-                e.preventDefault();
-                brandModal.setShowModal(false);
-                // Refocus the brand input
-                setTimeout(() => {
-                  brandRef.current?.focus();
-                }, 100);
-              }
-            }}
-          >
-            <input
-              ref={brandModal.inputRef}
-              className='form-control mb-3'
-              placeholder='Search brand...'
-              value={brandModal.filterText}
-              onChange={(e) => {
-                brandModal.setFilterText(e.target.value);
-                brandModal.setFocusedIndex(0);
-              }}
-            />
-
-            <table className='table table-hover table-bordered'>
-              <thead className='table-light'>
-                <tr>
-                  <th>Brand Name</th>
-                </tr>
-              </thead>
-              <tbody>
-                {brandModal.filteredItems.map((brand, idx) => (
-                  <tr
-                    key={brand._id}
-                    ref={(el) => (brandModal.rowRefs.current[idx] = el)}
-                    className={
-                      idx === brandModal.focusedIndex ? "table-active" : ""
-                    }
-                    onClick={() => {
-                      setPurchaseData((prev) => ({
-                        ...prev,
-                        item: {
-                          ...prev.item,
-                          companyId: brand._id,
-                        },
-                      }));
-                      brandModal.setShowModal(false);
-                    }}
-                  >
-                    <td>{brand.name}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
-
-      {/* Repeat for product modal */}
-      {productModal.showModal && (
-        <div
-          className='modal-overlay'
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            width: "100vw",
-            height: "100vh",
-            backgroundColor: "rgba(0,0,0,0.5)",
-            zIndex: 9999,
-          }}
-          onClick={() => productModal.setShowModal(false)}
-        >
-          <div
-            // className='modal-body'
-            // ref={productModal.modalRef}
-            // style={{
-            //   width: "80%",
-            //   margin: "5% auto",
-            //   backgroundColor: "white",
-            //   padding: "1rem",
-            //   maxHeight: "80vh",
-            //   overflowY: "auto",
-            // }}
-            // onClick={(e) => e.stopPropagation()}
-            // onKeyDown={(e) => {
-            //   if (e.key === "ArrowDown") {
-            //     e.preventDefault();
-            //     productModal.setFocusedIndex((prev) =>
-            //       prev < productModal.filteredItems.length - 1 ? prev + 1 : 0
-            //     );
-            //   }
-            //   if (e.key === "ArrowUp") {
-            //     e.preventDefault();
-            //     productModal.setFocusedIndex((prev) =>
-            //       prev > 0 ? prev - 1 : productModal.filteredItems.length - 1
-            //     );
-            //   }
-            //   if (e.key === "Enter" && productModal.focusedIndex >= 0) {
-            //     const selected =
-            //       productModal.filteredItems[productModal.focusedIndex];
-            //     // setPurchaseData((prev) => ({
-            //     //   ...prev,
-            //     //   item: {
-            //     //     ...prev.item,
-            //     //     productId: selected._id,
-            //     //   },
-            //     // }));
-            //     handleProductSelect(selected);
-
-            //     productModal.setShowModal(false);
-
-            //     // ✅ Focus quantity field
-            //     setTimeout(() => {
-            //       document.querySelector('input[name="quantity"]')?.focus();
-            //     }, 100);
-            //   }
-            // }}
-
-            className='modal-body'
-            ref={productModal.modalRef}
-            style={{
-              width: "80%",
-              margin: "5% auto",
-              backgroundColor: "white",
-              padding: "1rem",
-              maxHeight: "80vh",
-              overflowY: "auto",
-            }}
-            onClick={(e) => e.stopPropagation()}
-            onKeyDown={(e) => {
-              if (e.key === "ArrowDown") {
-                e.preventDefault();
-                productModal.setFocusedIndex((prev) =>
-                  prev < productModal.filteredItems.length - 1 ? prev + 1 : 0
-                );
-              }
-              if (e.key === "ArrowUp") {
-                e.preventDefault();
-                productModal.setFocusedIndex((prev) =>
-                  prev > 0 ? prev - 1 : productModal.filteredItems.length - 1
-                );
-              }
-              if (e.key === "Enter" && productModal.focusedIndex >= 0) {
-                e.preventDefault();
-                const selected =
-                  productModal.filteredItems[productModal.focusedIndex];
-                handleProductSelect(selected);
-                // Focus is already handled in handleProductSelect
-              }
-
-              if (e.key === "Escape") {
-                e.preventDefault();
-                productModal.setShowModal(false);
-                // Refocus the product input
-                setTimeout(() => {
-                  productRef.current?.focus();
-                }, 100);
-              }
-            }}
-          >
-            <input
-              ref={productModal.inputRef}
-              className='form-control mb-3'
-              placeholder='Search product...'
-              value={productModal.filterText}
-              onChange={(e) => {
-                productModal.setFilterText(e.target.value);
-                productModal.setFocusedIndex(0);
-              }}
-            />
-
-            <table className='table table-hover table-bordered'>
-              <thead className='table-light'>
-                <tr>
-                  <th>Product Name</th>
-                  <th>Brand</th>
-                  <th>HSN Code</th>
-                  <th>MRP</th>
-                  <th>Sales Rate</th>
-                  <th>Purchase Rate</th>
-                  {/*<th>Primary Price</th>*/}
-                  <th>Available QTY.</th>
-                  <th>GST%</th>
-                </tr>
-              </thead>
-              <tbody>
-                {productModal.filteredItems.map((prod, idx) => (
-                  <tr
-                    key={prod._id}
-                    ref={(el) => (productModal.rowRefs.current[idx] = el)}
-                    className={
-                      idx === productModal.focusedIndex ? "table-active" : ""
-                    }
-                    onClick={() => {
-                      setPurchaseData((prev) => ({
-                        ...prev,
-                        item: {
-                          ...prev.item,
-                          productId: prod._id,
-                        },
-                      }));
-                      productModal.setShowModal(false);
-                    }}
-                  >
-                    <td>{prod.productName}</td>
-                    <td>{prod.companyId?.name || "-"}</td>
-                    <td>{prod.hsnCode}</td>
-                    <td>{prod.mrp}</td>
-                    <td>{prod.salesRate}</td>
-                    <td>{prod.purchaseRate}</td>
-                    {/*  <td>{prod.primaryUnit}</td>
-                          <td>{prod.primaryPrice}</td>*/}
-                    <td>{prod.availableQty}</td>
-                    <td>{prod.gstPercent}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
+      <ProductModel
+        showModal={productModal.showModal}
+        setShowModal={productModal.setShowModal}
+        filterText={productModal.filterText}
+        setFilterText={productModal.setFilterText}
+        focusedIndex={productModal.focusedIndex}
+        setFocusedIndex={productModal.setFocusedIndex}
+        modalRef={productModal.modalRef}
+        inputRef={productModal.inputRef}
+        rowRefs={productModal.rowRefs}
+        filteredItems={productModal.filteredItems}
+        handleProductSelect={handleProductSelect}
+        productRef={productRef}
+      />
     </div>
   );
 };

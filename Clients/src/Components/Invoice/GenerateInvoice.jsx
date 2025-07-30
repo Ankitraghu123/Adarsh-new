@@ -167,11 +167,26 @@ const GenerateInvoice = () => {
     [billing]
   );
 
+  // useEffect(() => {
+  //   if (!loading && invoiceData) {
+  //     window.print();
+  //   }
+  // }, [loading, invoiceData]);
+
   useEffect(() => {
-    if (!loading && invoiceData) {
-      window.print();
-    }
-  }, [loading, invoiceData]);
+    const handlePrintShortcut = (e) => {
+      if (e.key === "F10") {
+        e.preventDefault();
+        window.print();
+      }
+    };
+
+    window.addEventListener("keydown", handlePrintShortcut);
+
+    return () => {
+      window.removeEventListener("keydown", handlePrintShortcut);
+    };
+  }, []);
 
   if (error) return <p className='text-danger'>{error}</p>;
   if (loading || !invoiceData) return <Loader />;

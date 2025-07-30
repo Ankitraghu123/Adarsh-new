@@ -7,7 +7,10 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { getAllBeats } from "../redux/features/customer/customerThunks";
 import { fetchSalesmen } from "../redux/features/salesMan/salesManThunks";
-import { fetchInvoicesBySalesman } from "../redux/features/product-bill/invoiceThunks";
+import {
+  fetchInvoicesByBeat,
+  fetchInvoicesBySalesman,
+} from "../redux/features/product-bill/invoiceThunks";
 
 const Outstanding = () => {
   const [showFilterModal, setShowFilterModal] = useState(true);
@@ -18,17 +21,24 @@ const Outstanding = () => {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
 
-  const { invoices, totalPendingAmount, count } = useSelector(
-    (s) => s?.invoice?.invoicesBySalesman || []
-  );
-  const areaWise = useSelector((s) => s?.invoice?.areaWise || []);
+  const {
+    invoices: salesmanInvoices,
+    totalPendingAmount: salesmanTotal,
+    count: salesmanCount,
+  } = useSelector((s) => s?.invoice?.invoicesBySalesman || {});
+
+  const {
+    invoices: areaWiseInvoices,
+    totalPendingAmount: areaWiseTotal,
+    count: areaWiseCount,
+  } = useSelector((s) => s?.invoice?.areaWise || {});
 
   const tableData =
     selectedType === "mrwise"
-      ? invoices
+      ? salesmanInvoices
       : selectedType === "areawise"
-      ? areaWise.length > 0
-        ? areaWise
+      ? areaWiseInvoices?.length > 0
+        ? areaWiseInvoices
         : [
             {
               invoice: "DUMMY/AREA001",
@@ -44,12 +54,10 @@ const Outstanding = () => {
 
   const dispatch = useDispatch();
 
-  // console.log(endDate, "OOo");
-
   useEffect(() => {
     dispatch(getAllBeats());
     dispatch(fetchSalesmen());
-  }, []);
+  }, [dispatch]);
 
   const handleFilterSubmit = (e) => {
     e.preventDefault();
@@ -63,15 +71,33 @@ const Outstanding = () => {
 
   const handleNameSubmit = (e) => {
     e.preventDefault();
+
     if (selectedName?.id) {
-      dispatch(fetchInvoicesBySalesman(selectedName.id));
+      if (selectedType === "mrwise") {
+        dispatch(fetchInvoicesBySalesman(selectedName.id));
+      } else if (selectedType === "areawise") {
+        dispatch(
+          fetchInvoicesByBeat({
+            beatId: selectedName.id,
+            beatName: selectedName.name,
+          })
+        );
+      } else {
+        alert("Unknown type selected!");
+      }
+
       setShowNameModal(false);
     } else {
       alert("Please select a name.");
     }
   };
 
-  const totalBillValue = totalPendingAmount?.toFixed(2);
+  const totalBillValue =
+    selectedType === "mrwise"
+      ? salesmanTotal?.toFixed(2)
+      : selectedType === "areawise"
+      ? areaWiseTotal?.toFixed(2)
+      : "0.00";
 
   return (
     <div className='p-3'>
@@ -121,14 +147,16 @@ const Outstanding = () => {
             <thead>
               <tr className='text-center fw-bold'>
                 <th colSpan={1}>TOTAL NO.</th>
-                <th colSpan={2}>BILLS : {count}</th>
+                <th colSpan={2}>
+                  BILLS :{" "}
+                  {selectedType === "mrwise" ? salesmanCount : areaWiseCount}
+                </th>
                 <th colSpan={2}>GRAND TOTAL : </th>
                 <th>{totalBillValue}</th>
                 <th colSpan={4}></th>
               </tr>
               <tr className='text-center border'>
                 <th>Sr No.</th>
-                {selectedType !== "mrwise" && <th>INVOICE</th>}
                 <th>DATE</th>
                 <th>PARTY NAME</th>
                 <th>BILL VALUE</th>
@@ -144,12 +172,10 @@ const Outstanding = () => {
                 tableData.map((row, index) => (
                   <tr key={index} className='text-center'>
                     <td>{index + 1}</td>
-                    {selectedType !== "mrwise" && <td>{row.invoice}</td>}
                     <td>{dayjs(row.billDate).format("DD-MM-YYYY")}</td>
-
                     <td>{row.customerName}</td>
                     <td>{row.billValue}</td>
-                    <td>{row.paid}</td>
+                    <td>{row.ledgerAmount}</td>
                     <td>{row.pendingAmount}</td>
                     <td
                       style={{

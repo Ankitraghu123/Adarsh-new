@@ -20,6 +20,7 @@ const createBilling = async (req, res) => {
       selectedBeatId,
       selectedCustomerId,
       selectedSalesmanId,
+      selectedBeatName,
       billingType,
     } = customer;
 
@@ -41,6 +42,7 @@ const createBilling = async (req, res) => {
       paymentMode: paymentMode || "",
       salesmanName: salesmanName || existingSalesman?.name || "",
       selectedBeatId: selectedBeatId || null,
+      selectedBeatName: selectedBeatName || null,
       selectedCustomerId: selectedCustomerId || null,
       selectedSalesmanId: selectedSalesmanId || null,
       billingType: billingType || "Credit",
@@ -603,76 +605,6 @@ const applyNewRef = async (req, res) => {
   }
 };
 
-// ✅ GET /api/invoices/by-salesman/:salesmanId
-
-// const getInvoicesBySalesman = async (req, res) => {
-//   try {
-//     const { salesmanId } = req.params;
-
-//     if (!salesmanId) {
-//       return res.status(400).json({ message: "Salesman ID is required" });
-//     }
-
-//     const result = await Invoice.aggregate([
-//       {
-//         $match: {
-//           $or: [
-//             { salesmanId: new mongoose.Types.ObjectId(salesmanId) },
-//             {
-//               "customer.selectedSalesmanId": new mongoose.Types.ObjectId(
-//                 salesmanId
-//               ),
-//             },
-//           ],
-//         },
-//       },
-//       {
-//         $addFields: {
-//           daysPending: {
-//             $dateDiff: {
-//               startDate: {
-//                 $ifNull: [
-//                   "$customer.Billdate",
-//                   { $ifNull: ["$billDate", "$createdAt"] },
-//                 ],
-//               },
-//               endDate: "$$NOW",
-//               unit: "day",
-//             },
-//           },
-//         },
-//       },
-//       {
-//         $group: {
-//           _id: null,
-//           totalPendingAmount: { $sum: "$pendingAmount" },
-//           invoices: { $push: "$$ROOT" },
-//         },
-//       },
-//     ]);
-
-//     if (!result.length) {
-//       return res.status(404).json({
-//         message: `No invoices found for salesman ID '${salesmanId}'`,
-//       });
-//     }
-
-//     const { totalPendingAmount, invoices } = result[0];
-
-//     res.status(200).json({
-//       message: "Invoices fetched successfully",
-//       count: invoices.length,
-//       totalPendingAmount,
-//       invoices,
-//     });
-//   } catch (error) {
-//     console.error("[getInvoicesBySalesman] Error:", error);
-//     res.status(500).json({
-//       error: "Failed to fetch salesman invoices",
-//       details: error.message,
-//     });
-//   }
-// };
 
 const getInvoicesBySalesman = async (req, res) => {
   try {
@@ -697,9 +629,36 @@ const getInvoicesBySalesman = async (req, res) => {
               ],
             },
             {
-              pendingAmount: { $gt: 0 }, // ✅ ONLY pendingAmount > 0
+              pendingAmount: { $gt: 0 },
             },
           ],
+        },
+      },
+      {
+        $lookup: {
+          from: "customerledgers",
+          let: { ledgerIds: "$ledgerIds" },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $in: ["$_id", "$$ledgerIds"],
+                },
+              },
+            },
+            {
+              $project: {
+                _id: 1,
+                voucherNumber: 1,
+                date: 1,
+                narration: 1,
+                debitAccount: 1,
+                creditAccount: 1,
+                amount: 1,
+              },
+            },
+          ],
+          as: "ledgerEntries",
         },
       },
       {
@@ -711,6 +670,7 @@ const getInvoicesBySalesman = async (req, res) => {
               unit: "day",
             },
           },
+          ledgerAmount: { $sum: "$ledgerEntries.amount" }, // ✅ ये sum जोड़ेगा
         },
       },
       { $sort: { createdAt: -1 } },
@@ -722,7 +682,6 @@ const getInvoicesBySalesman = async (req, res) => {
       });
     }
 
-    // ✅ Total pending amount sum
     const totalPendingAmount = result.reduce(
       (acc, invoice) => acc + Number(invoice.pendingAmount || 0),
       0
@@ -743,6 +702,158 @@ const getInvoicesBySalesman = async (req, res) => {
   }
 };
 
+
+
+
+const getInvoicesByBeat = async (req, res) => {
+  try {
+    const { beatId, beatName } = req.query;
+
+    if (!beatId && !beatName) {
+      return res.status(400).json({
+        error: "At least beatId or beatName is required.",
+      });
+    }
+
+    const queryOr = [];
+
+    if (beatId) {
+      queryOr.push({
+        "customer.selectedBeatId": new mongoose.Types.ObjectId(beatId),
+      });
+    }
+
+    if (beatName) {
+      queryOr.push({
+        "customer.selectedBeatName": beatName,
+      });
+
+const getInvoicesBySalesman = async (req, res) => {
+  try {
+    const { salesmanId } = req.params;
+
+    if (!salesmanId) {
+      return res.status(400).json({ message: "Salesman ID is required" });
+
+    }
+
+    const result = await Invoice.aggregate([
+      {
+        $match: {
+          $and: [
+            {
+
+              $or: queryOr,
+            },
+            {
+              pendingAmount: { $gt: 0 },
+            },
+          ],
+        },
+      },
+      {
+        $lookup: {
+          from: "customerledgers",
+          let: { ledgerIds: "$ledgerIds" },
+          pipeline: [
+            {
+              $match: {
+                $expr: { $in: ["$_id", "$$ledgerIds"] },
+              },
+            },
+            {
+              $project: {
+                _id: 1,
+                voucherNumber: 1,
+                date: 1,
+                narration: 1,
+                debitAccount: 1,
+                creditAccount: 1,
+                amount: 1,
+              },
+            },
+          ],
+          as: "ledgerEntries",
+
+              $or: [
+                { salesmanId: new mongoose.Types.ObjectId(salesmanId) },
+                {
+                  "customer.selectedSalesmanId": new mongoose.Types.ObjectId(
+                    salesmanId
+                  ),
+                },
+              ],
+            },
+            {
+              pendingAmount: { $gt: 0 }, // ✅ ONLY pendingAmount > 0
+            },
+          ],
+
+        },
+      },
+      {
+        $addFields: {
+          daysPending: {
+            $dateDiff: {
+              startDate: "$billDate",
+              endDate: "$$NOW",
+              unit: "day",
+            },
+          },
+
+          ledgerAmount: { $sum: "$ledgerEntries.amount" },
+        },
+      },
+      {
+        $sort: { createdAt: -1 },
+      },
+
+        },
+      },
+      { $sort: { createdAt: -1 } },
+
+    ]);
+
+    if (!result || result.length === 0) {
+      return res.status(404).json({
+
+        message: `No invoices found for Beat ID: '${beatId}' or Beat Name: '${beatName}'`,
+      });
+    }
+
+
+        message: `No invoices found for salesman ID '${salesmanId}'`,
+      });
+    }
+
+    // ✅ Total pending amount sum
+
+    const totalPendingAmount = result.reduce(
+      (acc, invoice) => acc + Number(invoice.pendingAmount || 0),
+      0
+    );
+
+    res.status(200).json({
+      message: "Invoices fetched successfully",
+      count: result.length,
+      totalPendingAmount,
+      invoices: result,
+    });
+  } catch (error) {
+
+    console.error("[getInvoicesByBeat] Error:", error);
+    res.status(500).json({
+      error: "Failed to fetch invoices by beat",
+
+    console.error("[getInvoicesBySalesman] Error:", error);
+    res.status(500).json({
+      error: "Failed to fetch salesman invoices",
+
+      details: error.message,
+    });
+  }
+};
+
 module.exports = {
   createBilling,
   getAllInvoices,
@@ -754,4 +865,7 @@ module.exports = {
   updateBilling,
   applyNewRef,
   getInvoicesBySalesman,
+
+  getInvoicesByBeat,
+
 };

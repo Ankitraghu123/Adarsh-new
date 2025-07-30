@@ -917,24 +917,59 @@ const ProductBillingReport = ({ onBillingDataChange }, ref) => {
               outline: "none",
             }}
             onClick={(e) => e.stopPropagation()}
+            // onKeyDown={(e) => {
+            //   if (e.key === "ArrowDown") {
+            //     e.preventDefault();
+            //     setFocusedIndex((prev) =>
+            //       prev < filteredProducts.length - 1 ? prev + 1 : 0
+            //     );
+            //   }
+            //   if (e.key === "ArrowUp") {
+            //     e.preventDefault();
+            //     setFocusedIndex((prev) =>
+            //       prev > 0 ? prev - 1 : filteredProducts.length - 1
+            //     );
+            //   }
+            //   if (e.key === "Enter" && focusedIndex !== -1) {
+            //     const selectedProduct = filteredProducts[focusedIndex];
+            //     handleChange(selectedRowIndex, "product", selectedProduct);
+            //     setShowModal(false);
+
+            //     setTimeout(() => {
+            //       qtyRefs.current[selectedRowIndex]?.focus();
+            //     }, 100);
+            //   }
+            // }}
             onKeyDown={(e) => {
               if (e.key === "ArrowDown") {
                 e.preventDefault();
-                setFocusedIndex((prev) =>
-                  prev < filteredProducts.length - 1 ? prev + 1 : 0
+                let nextIndex = focusedIndex;
+                do {
+                  nextIndex =
+                    nextIndex < filteredProducts.length - 1 ? nextIndex + 1 : 0;
+                } while (
+                  virtualStockMap[filteredProducts[nextIndex]._id] === 0
                 );
+                setFocusedIndex(nextIndex);
               }
+
               if (e.key === "ArrowUp") {
                 e.preventDefault();
-                setFocusedIndex((prev) =>
-                  prev > 0 ? prev - 1 : filteredProducts.length - 1
+                let prevIndex = focusedIndex;
+                do {
+                  prevIndex =
+                    prevIndex > 0 ? prevIndex - 1 : filteredProducts.length - 1;
+                } while (
+                  virtualStockMap[filteredProducts[prevIndex]._id] === 0
                 );
+                setFocusedIndex(prevIndex);
               }
+
               if (e.key === "Enter" && focusedIndex !== -1) {
                 const selectedProduct = filteredProducts[focusedIndex];
+                if (virtualStockMap[selectedProduct._id] === 0) return; // stock 0 skip
                 handleChange(selectedRowIndex, "product", selectedProduct);
                 setShowModal(false);
-
                 setTimeout(() => {
                   qtyRefs.current[selectedRowIndex]?.focus();
                 }, 100);
@@ -975,10 +1010,30 @@ const ProductBillingReport = ({ onBillingDataChange }, ref) => {
               </thead>
               <tbody>
                 {filteredProducts.map((product, index) => (
+                  /* <tr
+                    key={product._id}
+                    ref={(el) => (rowRefs.current[index] = el)}
+                    className={index === focusedIndex ? "table-active" : ""}
+                  > */
                   <tr
                     key={product._id}
                     ref={(el) => (rowRefs.current[index] = el)}
                     className={index === focusedIndex ? "table-active" : ""}
+                    style={{
+                      opacity: virtualStockMap[product._id] === 0 ? 0.5 : 1,
+                      cursor:
+                        virtualStockMap[product._id] === 0
+                          ? "not-allowed"
+                          : "pointer",
+                    }}
+                    onClick={() => {
+                      if (virtualStockMap[product._id] === 0) return; // stock 0 waale ko disable karo
+                      handleChange(selectedRowIndex, "product", product);
+                      setShowModal(false);
+                      setTimeout(() => {
+                        qtyRefs.current[selectedRowIndex]?.focus();
+                      }, 100);
+                    }}
                   >
                     <td>{index + 1}</td>
                     <td>
