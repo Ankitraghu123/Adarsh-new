@@ -67,25 +67,12 @@ exports.deleteCustomer = async (req, res) => {
   }
 };
 
-// exports.getAllBeats = async (req, res) => {
-//   try {
-//     const beats = await Customer.aggregate([
-//       {
-//         $group: {
-//           _id: "$area",
-//         },
-//       },
-//     ]);
-//     res.json(beats);
-//   } catch (err) {
-//     res.status(500).json({ error: err.message });
-//   }
-// };
 
 exports.getAllBeats = async (req, res) => {
   try {
     const beats = await Customer.aggregate([
       {
+
         $match: {
           area: { $exists: true, $ne: null }, // area null नहीं होनी चाहिए
         },
@@ -110,6 +97,14 @@ exports.getAllBeats = async (req, res) => {
       count: beats.length,
       beats,
     });
+
+        $group: {
+          _id: "$area",
+        },
+      },
+    ]);
+    res.json(beats);
+
   } catch (err) {
     console.error("getAllBeats error:", err);
     res.status(500).json({ error: err.message });

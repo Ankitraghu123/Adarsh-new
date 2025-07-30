@@ -117,6 +117,7 @@ export const fetchInvoicesBySalesman = createAsyncThunk(
   }
 );
 
+
 // ✅ Get invoices by Beat (Area)
 export const fetchInvoicesByBeat = createAsyncThunk(
   "invoice/fetchInvoicesByBeat",
@@ -138,3 +139,4 @@ export const fetchInvoicesByBeat = createAsyncThunk(
     }
   }
 );
+
