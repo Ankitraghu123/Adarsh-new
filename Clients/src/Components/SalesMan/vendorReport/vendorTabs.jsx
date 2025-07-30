@@ -204,8 +204,8 @@ const VendorTabs = () => {
             <span
               ref={formTabRef}
               tabIndex={0}
-              className="tab-title"
-              aria-controls="form-tab-panel"
+              className='tab-title'
+              aria-controls='form-tab-panel'
             >
               {editId ? "Edit Vendor" : "Add Vendor"}
             </span>
@@ -226,8 +226,8 @@ const VendorTabs = () => {
             <span
               ref={listTabRef}
               tabIndex={0}
-              className="tab-title"
-              aria-controls="list-tab-panel"
+              className='tab-title'
+              aria-controls='list-tab-panel'
             >
               Vendor List
             </span>

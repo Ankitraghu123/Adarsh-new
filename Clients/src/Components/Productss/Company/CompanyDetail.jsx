@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
+
 import axios from "../../../Config/axios";
 import {
   Tab,
@@ -10,7 +11,7 @@ import {
   Pagination,
 } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { CKEditor } from "@ckeditor/ckeditor5-react";
+
 import AddTask from "./AddCompany";
 import toast from "react-hot-toast";
 import Loader from "../../Loader";
@@ -20,6 +21,8 @@ const CompanyDetail = () => {
   const [activeTab, setActiveTab] = useState("view");
   const [companies, setCompanies] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  const viewTabRef = useRef(null);
 
   const fetchCompanies = async () => {
     setLoading(true);
@@ -34,6 +37,34 @@ const CompanyDetail = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    setActiveTab("view"); // safety
+
+    if (viewTabRef.current) {
+      viewTabRef.current.focus();
+    }
+  }, []);
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === "ArrowRight") {
+        if (activeTab === "view") {
+          setActiveTab("add");
+        }
+      } else if (e.key === "ArrowLeft") {
+        if (activeTab === "add") {
+          setActiveTab("view");
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [activeTab]);
 
   useEffect(() => {
     fetchCompanies();
@@ -136,7 +167,12 @@ const CompanyDetail = () => {
                 onSelect={(k) => setActiveTab(k)}
                 className='mb-3'
               >
-                <Tab eventKey='view' title={<b>View Brand</b>} />
+                {/* <Tab eventKey='view' title={<b>View Brand</b>} /> */}
+
+                <Tab eventKey='view' title={<b>View Brand</b>}>
+                  <div ref={viewTabRef}>{/* your content */}</div>
+                </Tab>
+
                 <Tab eventKey='add' title={<b>Add Brand</b>} />
               </Tabs>
             </div>

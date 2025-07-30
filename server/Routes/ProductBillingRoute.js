@@ -15,7 +15,8 @@ router.get("/by-salesman/:salesmanId", BillingCtrl.getInvoicesBySalesman);
 router.get("/balance/customer/:customerId", BillingCtrl.getBalanceByCustomer);
 router.get("/customer/:customerIdOrName", BillingCtrl.getInvoicesByCustomer);
 
-router.delete("/:id", BillingCtrl.deleteInvoice);
+router.put("/:id", BillingCtrl.updateBilling);
 router.get("/:id", BillingCtrl.getInvoiceById);
+router.delete("/:id", BillingCtrl.deleteInvoice);
 
 module.exports = router;

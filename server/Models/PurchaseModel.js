@@ -55,6 +55,10 @@ const purchaseSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    companyId: {
+      type: String,
+      // required: true,
+    },
 
     // ✅ Final amount and pending amount like invoice
     finalAmount: {

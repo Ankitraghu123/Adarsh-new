@@ -39,6 +39,8 @@ const ProductForm = ({ onSuccess, productToEdit }) => {
   });
 
   const [companies, setCompanies] = useState([]);
+  const [showBrandList, setShowBrandList] = useState(false);
+  const [brandIndex, setBrandIndex] = useState(0);
 
   const fetchProducts = async () => {
     try {
@@ -279,6 +281,38 @@ const ProductForm = ({ onSuccess, productToEdit }) => {
     }
   };
 
+  const handleBrandKeyDown = (e) => {
+    if (!showBrandList) setShowBrandList(true);
+
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setBrandIndex((prev) => (prev < companies.length - 1 ? prev + 1 : prev));
+    }
+
+    if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setBrandIndex((prev) => (prev > 0 ? prev - 1 : prev));
+    }
+
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleBrandSelect(brandIndex);
+    }
+
+    if (e.key === "Escape") {
+      setShowBrandList(false);
+    }
+  };
+
+  const handleBrandSelect = (index) => {
+    const selected = companies[index];
+    if (selected) {
+      setFormData((prev) => ({ ...prev, companyId: selected._id }));
+      setShowBrandList(false);
+      inputRefs.current[1]?.focus(); // Focus to next input!
+    }
+  };
+
   return (
     <div className='col-md-12 mb-4'>
       <div className='card shadow border-0'>
@@ -286,7 +320,7 @@ const ProductForm = ({ onSuccess, productToEdit }) => {
           <form onSubmit={handleSubmit}>
             <div className='row'>
               {/* Brand */}
-              <div className='col-md-6 mb-3'>
+              {/* <div className='col-md-6 mb-3'>
                 <label>Brand</label>
                 <select
                   ref={(el) => (inputRefs.current[0] = el)}
@@ -303,7 +337,56 @@ const ProductForm = ({ onSuccess, productToEdit }) => {
                     </option>
                   ))}
                 </select>
+              </div> */}
+
+              <div className='col-md-6 mb-3' style={{ position: "relative" }}>
+                <label>Brand</label>
+                <input
+                  type='text'
+                  ref={(el) => (inputRefs.current[0] = el)}
+                  onKeyDown={(e) => handleBrandKeyDown(e)}
+                  onFocus={() => setShowBrandList(true)}
+                  value={
+                    formData.companyId
+                      ? companies.find((c) => c._id === formData.companyId)
+                          ?.name || ""
+                      : ""
+                  }
+                  readOnly
+                  className='form-control'
+                />
+                {showBrandList && (
+                  <ul
+                    style={{
+                      listStyle: "none",
+                      margin: 0,
+                      padding: "0.5rem",
+                      border: "1px solid #ccc",
+                      position: "absolute",
+                      background: "#fff",
+                      width: "100%",
+                      maxHeight: "200px",
+                      overflowY: "auto",
+                      zIndex: 999,
+                    }}
+                  >
+                    {companies.map((c, i) => (
+                      <li
+                        key={c._id}
+                        style={{
+                          padding: "0.25rem",
+                          background: brandIndex === i ? "#ddd" : "#fff",
+                          cursor: "pointer",
+                        }}
+                        onMouseDown={() => handleBrandSelect(i)}
+                      >
+                        {c.name}
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </div>
+
               {/* Other inputs */}
               <div className='col-md-6 mb-3'>
                 <label>Product Name</label>
