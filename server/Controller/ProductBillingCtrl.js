@@ -230,7 +230,7 @@ const updateBilling = async (req, res) => {
       invoice,
     });
   } catch (err) {
-    console.error("[updateBilling] Error:", err);
+    console.error("[updateBilling] Error :", err);
     res.status(500).json({ error: err.message });
   }
 };
@@ -269,6 +269,43 @@ const deleteInvoice = async (req, res) => {
 };
 
 // Get  invoice by id
+// const getInvoiceById = async (req, res) => {
+//   try {
+//     const invoice = await Invoice.findById(req.params.id)
+//       .populate("companyId")
+//       .populate("salesmanId")
+//       .populate("billing.productId")
+//       .populate("customerId", "firm name mobile address gstNumber");
+
+//     if (!invoice) {
+//       return res.status(404).json({ message: "Invoice not found" });
+//     }
+
+//     // Format billing fields
+//     const formattedBilling = invoice.billing.map((item) => ({
+//       ...item.toObject(),
+//       rate: item.rate.toFixed(2),
+//       amount: item.amount.toFixed(2),
+//       total: item.total.toFixed(2),
+//       cdAmt: item.cdAmt.toFixed(2),
+//       schAmt: item.schAmt.toFixed(2),
+//       gst: Number(item.gst).toFixed(1), // single decimal place
+//       cd: `${Number(item.cd).toFixed(1)}%`,
+//       sch: `${Number(item.sch).toFixed(1)}%`,
+//     }));
+
+//     // Create a formatted response with modified billing
+//     const formattedInvoice = {
+//       ...invoice.toObject(),
+//       billing: formattedBilling,
+//     };
+
+//     res.status(200).json(formattedInvoice);
+//   } catch (error) {
+//     console.error("Error fetching invoice:", error);
+//     res.status(500).json({ error: "Failed to fetch invoice" });
+//   }
+// };
 const getInvoiceById = async (req, res) => {
   try {
     const invoice = await Invoice.findById(req.params.id)
@@ -281,20 +318,19 @@ const getInvoiceById = async (req, res) => {
       return res.status(404).json({ message: "Invoice not found" });
     }
 
-    // Format billing fields
+    // 👉 SAFE FORMATTING: NULL/undefined से बचाने के लिए default 0 लगा दे
     const formattedBilling = invoice.billing.map((item) => ({
       ...item.toObject(),
-      rate: item.rate.toFixed(2),
-      amount: item.amount.toFixed(2),
-      total: item.total.toFixed(2),
-      cdAmt: item.cdAmt.toFixed(2),
-      schAmt: item.schAmt.toFixed(2),
-      gst: Number(item.gst).toFixed(1), // single decimal place
-      cd: `${Number(item.cd).toFixed(1)}%`,
-      sch: `${Number(item.sch).toFixed(1)}%`,
+      rate: Number(item.rate ?? 0).toFixed(2),
+      amount: Number(item.amount ?? 0).toFixed(2),
+      total: Number(item.total ?? 0).toFixed(2),
+      cdAmt: Number(item.cdAmt ?? 0).toFixed(2),
+      schAmt: Number(item.schAmt ?? 0).toFixed(2),
+      gst: Number(item.gst ?? 0).toFixed(1), // 1 decimal
+      cd: `${Number(item.cd ?? 0).toFixed(1)}%`,
+      sch: `${Number(item.sch ?? 0).toFixed(1)}%`,
     }));
 
-    // Create a formatted response with modified billing
     const formattedInvoice = {
       ...invoice.toObject(),
       billing: formattedBilling,
@@ -605,7 +641,6 @@ const applyNewRef = async (req, res) => {
   }
 };
 
-
 const getInvoicesBySalesman = async (req, res) => {
   try {
     const { salesmanId } = req.params;
@@ -702,9 +737,6 @@ const getInvoicesBySalesman = async (req, res) => {
   }
 };
 
-
-
-
 const getInvoicesByBeat = async (req, res) => {
   try {
     const { beatId, beatName } = req.query;
@@ -727,14 +759,6 @@ const getInvoicesByBeat = async (req, res) => {
       queryOr.push({
         "customer.selectedBeatName": beatName,
       });
-
-const getInvoicesBySalesman = async (req, res) => {
-  try {
-    const { salesmanId } = req.params;
-
-    if (!salesmanId) {
-      return res.status(400).json({ message: "Salesman ID is required" });
-
     }
 
     const result = await Invoice.aggregate([
@@ -742,7 +766,6 @@ const getInvoicesBySalesman = async (req, res) => {
         $match: {
           $and: [
             {
-
               $or: queryOr,
             },
             {
@@ -774,21 +797,6 @@ const getInvoicesBySalesman = async (req, res) => {
             },
           ],
           as: "ledgerEntries",
-
-              $or: [
-                { salesmanId: new mongoose.Types.ObjectId(salesmanId) },
-                {
-                  "customer.selectedSalesmanId": new mongoose.Types.ObjectId(
-                    salesmanId
-                  ),
-                },
-              ],
-            },
-            {
-              pendingAmount: { $gt: 0 }, // ✅ ONLY pendingAmount > 0
-            },
-          ],
-
         },
       },
       {
@@ -800,33 +808,19 @@ const getInvoicesBySalesman = async (req, res) => {
               unit: "day",
             },
           },
-
           ledgerAmount: { $sum: "$ledgerEntries.amount" },
         },
       },
       {
         $sort: { createdAt: -1 },
       },
-
-        },
-      },
-      { $sort: { createdAt: -1 } },
-
     ]);
 
     if (!result || result.length === 0) {
       return res.status(404).json({
-
         message: `No invoices found for Beat ID: '${beatId}' or Beat Name: '${beatName}'`,
       });
     }
-
-
-        message: `No invoices found for salesman ID '${salesmanId}'`,
-      });
-    }
-
-    // ✅ Total pending amount sum
 
     const totalPendingAmount = result.reduce(
       (acc, invoice) => acc + Number(invoice.pendingAmount || 0),
@@ -840,15 +834,9 @@ const getInvoicesBySalesman = async (req, res) => {
       invoices: result,
     });
   } catch (error) {
-
     console.error("[getInvoicesByBeat] Error:", error);
     res.status(500).json({
       error: "Failed to fetch invoices by beat",
-
-    console.error("[getInvoicesBySalesman] Error:", error);
-    res.status(500).json({
-      error: "Failed to fetch salesman invoices",
-
       details: error.message,
     });
   }
@@ -867,5 +855,4 @@ module.exports = {
   getInvoicesBySalesman,
 
   getInvoicesByBeat,
-
 };

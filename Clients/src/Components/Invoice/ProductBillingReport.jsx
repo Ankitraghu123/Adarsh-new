@@ -29,13 +29,15 @@ const defaultRow = {
   Amount: 0,
 };
 
-const ProductBillingReport = ({ onBillingDataChange }, ref) => {
+const ProductBillingReport = ({ onBillingDataChange, onEdit }, ref) => {
   const [rows, setRows] = useState([{ ...defaultRow }]);
   const [products, setProducts] = useState([]);
   const [finalTotalAmount, setFinalTotalAmount] = useState("0.00");
 
   const [showSchemeModal, setShowSchemeModal] = useState(false);
   const [schemeValue, setSchemeValue] = useState("");
+
+  const basicRefs = useRef([]);
 
   const [showCDModal, setShowCDModal] = useState(false);
   const [cdValue, setCDValue] = useState("");
@@ -655,6 +657,50 @@ const ProductBillingReport = ({ onBillingDataChange }, ref) => {
 
   const virtualStockMap = getVirtualStockMap();
 
+  useEffect(() => {
+    if (onEdit && onEdit.billing) {
+      const preFilledRows = onEdit.billing.map((item) => {
+        // Build initial row
+        const row = {
+          product: item.productId, // Make sure productId is full product object here
+          ItemName: item.itemName,
+          Unit: item.unit,
+          Qty: item.qty,
+          Free: item.Free,
+          Rate: item.rate,
+          Sch: parseFloat(item.sch) || 0,
+          SchAmt: parseFloat(item.schAmt) || 0,
+          CD: parseFloat(item.cd) || 0,
+          CDAmt: parseFloat(item.cdAmt) || 0,
+          Total: parseFloat(item.total) || 0,
+          GST: parseFloat(item.gst) || 0,
+          Amount: parseFloat(item.amount) || 0,
+        };
+
+        // Recalculate to get Basic, Total, SchAmt, CDAmt, Amount properly
+        return recalculateRow(row);
+      });
+      setRows(preFilledRows);
+
+      const finalTotal = preFilledRows
+        .reduce((sum, r) => {
+          const amt = parseFloat(r.Amount);
+          return sum + (isNaN(amt) ? 0 : amt);
+        }, 0)
+        .toFixed(2);
+
+      setFinalTotalAmount(finalTotal);
+
+      setTimeout(() => {
+        const focusIndex = 1; // Zero-based index 1 means second row
+        const basicInput = basicRefs.current[focusIndex];
+        if (basicInput) {
+          basicInput.focus();
+        }
+      }, 100);
+    }
+  }, [onEdit]);
+
   return (
     <div
       className='mt-4'
@@ -814,6 +860,7 @@ const ProductBillingReport = ({ onBillingDataChange }, ref) => {
                       <input
                         type='text'
                         className='form-control'
+                        ref={(el) => (basicRefs.current[rowIndex] = el)} // store ref here
                         value={row[field]}
                         onFocus={() => {
                           if (row[field] === "0.00" || row[field] === 0) {

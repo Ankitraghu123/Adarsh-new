@@ -22,12 +22,12 @@ function BillingReport() {
 
   const [originalInvoice, setOriginalInvoice] = useState(null);
 
-  // console.log(originalInvoice, "Original data");
-
   const [loading, setLoading] = useState(false);
 
   const dispatch = useDispatch();
   const { id } = useParams();
+
+  console.log(originalInvoice, "Original");
 
   useEffect(() => {
     if (id) {
@@ -35,9 +35,9 @@ function BillingReport() {
         .unwrap()
         .then((invoice) => {
           setOriginalInvoice(invoice);
-          setCustomerData(invoice.customer);
-          setBillingData(invoice.billing);
-          setFinalAmount(invoice.finalAmount || 0);
+          // setCustomerData(invoice.customer);
+          // setBillingData(invoice.billing);
+          // setFinalAmount(invoice.finalAmount || 0);
         })
         .catch((err) => {
           console.error("Failed to load invoice: " + err);
@@ -140,20 +140,6 @@ function BillingReport() {
     productRef.current?.focusItemName();
   };
 
-  // useEffect(() => {
-  //   const handleKeyDown = (e) => {
-  //     if (e.key === "F10") {
-  //       e.preventDefault();
-  //       handleSubmit();
-  //     }
-  //   };
-
-  //   window.addEventListener("keydown", handleKeyDown);
-  //   return () => {
-  //     window.removeEventListener("keydown", handleKeyDown);
-  //   };
-  // }, [handleSubmit]);
-
   useEffect(() => {
     const handleKeyDown = async (e) => {
       if (e.key === "F10") {
@@ -183,6 +169,7 @@ function BillingReport() {
         value={customerData}
         onDataChange={handleCustomerDataChange}
         resetTrigger={resetKey}
+        onEdit={originalInvoice}
         onNextFocus={focusNextComponent}
       />
       <ProductBillingReport
@@ -191,6 +178,7 @@ function BillingReport() {
         ref={productRef}
         onBillingDataChange={handleBillingDataChange}
         key={resetKey}
+        onEdit={originalInvoice}
       />
 
       <div
