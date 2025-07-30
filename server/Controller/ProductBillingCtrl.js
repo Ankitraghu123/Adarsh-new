@@ -605,6 +605,7 @@ const applyNewRef = async (req, res) => {
   }
 };
 
+
 const getInvoicesBySalesman = async (req, res) => {
   try {
     const { salesmanId } = req.params;
@@ -701,52 +702,8 @@ const getInvoicesBySalesman = async (req, res) => {
   }
 };
 
-// const getInvoicesByBeat = async (req, res) => {
-//   try {
-//     const { beatId, beatName } = req.query;
 
-//     if (!beatId && !beatName) {
-//       return res.status(400).json({
-//         error: "At least beatId or beatName is required.",
-//       });
-//     }
 
-//     const query = {
-//       $or: [],
-//     };
-
-//     if (beatId) {
-//       query.$or.push({ "customer.selectedBeatId": beatId });
-//     }
-
-//     if (beatName) {
-//       query.$or.push({ "customer.selectedBeatName": beatName });
-//     }
-
-//     const invoices = await Invoice.find(query)
-//       .sort({ createdAt: -1 })
-//       .populate("customerId", "name")
-//       .populate("salesmanId", "name")
-//       .populate("billing.productId", "productName");
-
-//     if (!invoices || invoices.length === 0) {
-//       return res.status(404).json({
-//         message: `No invoices found for Beat ID: '${beatId}' or Beat Name: '${beatName}'`,
-//       });
-//     }
-
-//     res.status(200).json({
-//       count: invoices.length,
-//       invoices,
-//     });
-//   } catch (error) {
-//     console.error("[getInvoicesByBeat] Error:", error);
-//     res.status(500).json({
-//       error: "Failed to fetch invoices by beat",
-//       details: error.message,
-//     });
-//   }
-// };
 
 const getInvoicesByBeat = async (req, res) => {
   try {
@@ -770,6 +727,14 @@ const getInvoicesByBeat = async (req, res) => {
       queryOr.push({
         "customer.selectedBeatName": beatName,
       });
+
+const getInvoicesBySalesman = async (req, res) => {
+  try {
+    const { salesmanId } = req.params;
+
+    if (!salesmanId) {
+      return res.status(400).json({ message: "Salesman ID is required" });
+
     }
 
     const result = await Invoice.aggregate([
@@ -777,6 +742,7 @@ const getInvoicesByBeat = async (req, res) => {
         $match: {
           $and: [
             {
+
               $or: queryOr,
             },
             {
@@ -808,6 +774,21 @@ const getInvoicesByBeat = async (req, res) => {
             },
           ],
           as: "ledgerEntries",
+
+              $or: [
+                { salesmanId: new mongoose.Types.ObjectId(salesmanId) },
+                {
+                  "customer.selectedSalesmanId": new mongoose.Types.ObjectId(
+                    salesmanId
+                  ),
+                },
+              ],
+            },
+            {
+              pendingAmount: { $gt: 0 }, // ✅ ONLY pendingAmount > 0
+            },
+          ],
+
         },
       },
       {
@@ -819,19 +800,33 @@ const getInvoicesByBeat = async (req, res) => {
               unit: "day",
             },
           },
+
           ledgerAmount: { $sum: "$ledgerEntries.amount" },
         },
       },
       {
         $sort: { createdAt: -1 },
       },
+
+        },
+      },
+      { $sort: { createdAt: -1 } },
+
     ]);
 
     if (!result || result.length === 0) {
       return res.status(404).json({
+
         message: `No invoices found for Beat ID: '${beatId}' or Beat Name: '${beatName}'`,
       });
     }
+
+
+        message: `No invoices found for salesman ID '${salesmanId}'`,
+      });
+    }
+
+    // ✅ Total pending amount sum
 
     const totalPendingAmount = result.reduce(
       (acc, invoice) => acc + Number(invoice.pendingAmount || 0),
@@ -845,9 +840,15 @@ const getInvoicesByBeat = async (req, res) => {
       invoices: result,
     });
   } catch (error) {
+
     console.error("[getInvoicesByBeat] Error:", error);
     res.status(500).json({
       error: "Failed to fetch invoices by beat",
+
+    console.error("[getInvoicesBySalesman] Error:", error);
+    res.status(500).json({
+      error: "Failed to fetch salesman invoices",
+
       details: error.message,
     });
   }
@@ -864,5 +865,7 @@ module.exports = {
   updateBilling,
   applyNewRef,
   getInvoicesBySalesman,
+
   getInvoicesByBeat,
+
 };

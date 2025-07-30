@@ -57,9 +57,7 @@ const Outstanding = () => {
   useEffect(() => {
     dispatch(getAllBeats());
     dispatch(fetchSalesmen());
-  }, []);
-
-  console.log(selectedName, "aklsdj");
+  }, [dispatch]);
 
   const handleFilterSubmit = (e) => {
     e.preventDefault();
@@ -70,16 +68,6 @@ const Outstanding = () => {
       alert("Please select Type.");
     }
   };
-
-  // const handleNameSubmit = (e) => {
-  //   e.preventDefault();
-  //   if (selectedName?.id) {
-  //     dispatch(fetchInvoicesBySalesman(selectedName.id));
-  //     setShowNameModal(false);
-  //   } else {
-  //     alert("Please select a name.");
-  //   }
-  // };
 
   const handleNameSubmit = (e) => {
     e.preventDefault();
@@ -159,19 +147,16 @@ const Outstanding = () => {
             <thead>
               <tr className='text-center fw-bold'>
                 <th colSpan={1}>TOTAL NO.</th>
-                {/* <th colSpan={2}>BILLS : {count}</th> */}
                 <th colSpan={2}>
                   BILLS :{" "}
                   {selectedType === "mrwise" ? salesmanCount : areaWiseCount}
                 </th>
-
                 <th colSpan={2}>GRAND TOTAL : </th>
                 <th>{totalBillValue}</th>
                 <th colSpan={4}></th>
               </tr>
               <tr className='text-center border'>
                 <th>Sr No.</th>
-                {/* {selectedType !== "mrwise" && <th>INVOICE</th>} */}
                 <th>DATE</th>
                 <th>PARTY NAME</th>
                 <th>BILL VALUE</th>
@@ -187,9 +172,7 @@ const Outstanding = () => {
                 tableData.map((row, index) => (
                   <tr key={index} className='text-center'>
                     <td>{index + 1}</td>
-                    {/* {selectedType !== "mrwise" && <td>{row.invoice}</td>} */}
                     <td>{dayjs(row.billDate).format("DD-MM-YYYY")}</td>
-
                     <td>{row.customerName}</td>
                     <td>{row.billValue}</td>
                     <td>{row.ledgerAmount}</td>
