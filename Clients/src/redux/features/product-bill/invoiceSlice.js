@@ -8,10 +8,12 @@ import {
   fetchInvoicesByCustomer,
   fetchBalanceByCustomer,
   fetchInvoicesBySalesman,
+  fetchInvoicesByBeat,
 } from "./invoiceThunks";
 
 const initialState = {
   invoices: [],
+  areaWise: [],
   currentInvoice: null,
   invoicesByCustomer: [],
   invoicesBySalesman: [],
@@ -33,6 +35,19 @@ const invoiceSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+
+      .addCase(fetchInvoicesByBeat.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchInvoicesByBeat.fulfilled, (state, action) => {
+        state.loading = false;
+        state.areaWise = action.payload || [];
+      })
+      .addCase(fetchInvoicesByBeat.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload?.error || action.error.message;
+      })
 
       // ✅ Invoices by Salesman
       .addCase(fetchInvoicesBySalesman.pending, (state) => {

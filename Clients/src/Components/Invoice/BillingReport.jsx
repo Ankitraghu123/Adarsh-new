@@ -158,12 +158,12 @@ function BillingReport() {
     const handleKeyDown = async (e) => {
       if (e.key === "F10") {
         e.preventDefault();
-        await handleSubmit(true); // pass `true` → means navigate
+        await handleSubmit(true);
       }
 
       if (e.altKey && (e.key === "w" || e.key === "W")) {
         e.preventDefault();
-        await handleSubmit(false); // pass `false` → means do NOT navigate
+        await handleSubmit(true); // ✅ changed false → true
       }
     };
 

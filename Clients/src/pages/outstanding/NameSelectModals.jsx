@@ -91,13 +91,16 @@ const NameSelectModals = ({
 }) => {
   const mrList = useSelector((s) => s?.salesman?.salesmen || []);
   const areaList = useSelector((s) => s?.customer?.beats || []);
-
+  // console.log(areaList, "areaList");
   let options = [];
 
   if (selectedType === "mrwise") {
     options = mrList.map((mr) => ({ id: mr._id, name: mr.name }));
   } else {
-    options = areaList.map((a) => ({ id: a._id, name: a.beatName || a.name }));
+    options = areaList.map((a) => ({
+      id: a.areaId,
+      name: a.areaName || a.name,
+    }));
   }
 
   useEffect(() => {
