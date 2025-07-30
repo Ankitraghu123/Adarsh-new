@@ -115,10 +115,41 @@ const deleteSalesman = async (req, res) => {
   }
 };
 
+const getAllBeats = async (req, res) => {
+  try {
+    const beats = await Salesman.aggregate([
+      { $unwind: "$beat" },
+      {
+        $group: {
+          _id: "$beat.area", // unique name
+          areaId: { $first: "$beat._id" }, // उसी area का कोई एक beat ID
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          areaName: "$_id",
+          areaId: 1,
+        },
+      },
+    ]);
+
+    res.json({
+      message: "Beats fetched successfully",
+      count: beats.length,
+      beats,
+    });
+  } catch (err) {
+    console.error("getAllBeats error:", err);
+    res.status(500).json({ error: err.message });
+  }
+};
+
 module.exports = {
   createSalesman,
   Display,
   getSingleSalesman,
   updateSalesman,
   deleteSalesman,
+  getAllBeats,
 };

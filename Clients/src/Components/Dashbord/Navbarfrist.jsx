@@ -135,6 +135,11 @@ const Navbarfrist = () => {
           <div className='dropdown mt-2'>
             <button
               onClick={() => toggleDropdown("master")}
+              onKeyDown={(e) =>{
+                if (e.key === "ArrowDown" ){
+                  setOpenDropdown('master');
+                }
+              }}
               className='btn text-white w-100 text-start d-flex align-items-center gap-2'
               ref={(el) => (navLinksRef.current[1] = el)}
             >
@@ -189,6 +194,14 @@ const Navbarfrist = () => {
           <div className='dropdown mt-2'>
             <button
               onClick={() => toggleDropdown("sales")}
+              onKeyDown={(e) =>{
+                if (e.key === "ArrowDown"){
+                  toggleDropdown("sales");
+                }
+                if( e.key === "ArrowUp"){
+                  toggleDropdown("master");
+                }
+              }}
               className='btn text-white w-100 text-start d-flex align-items-center gap-2'
               ref={(el) => (navLinksRef.current[7] = el)}
             >
@@ -221,6 +234,11 @@ const Navbarfrist = () => {
             ref={(el) => (navLinksRef.current[10] = el)}
             style={navLinkStyle("/purchase")}
             onClick={closeSidebar}
+            onKeyDown={(e) =>{
+              if (e.key === "ArrowUp"){
+                toggleDropdown("sales");
+              }
+            }}
             className='d-flex align-items-center gap-2'
           >
             <FiLayers /> Purchase Bill
@@ -251,6 +269,11 @@ const Navbarfrist = () => {
           <div className='dropdown mt-2'>
             <button
               onClick={() => toggleDropdown("modifybill")}
+              onKeyDown={(e) =>{
+                if (e.key === "Enter"){
+                  toggleDropdown("modifybill");
+                }
+              }}
               className='btn text-white w-100 text-start d-flex align-items-center gap-2'
               ref={(el) => (navLinksRef.current[13] = el)}
             >
@@ -261,6 +284,14 @@ const Navbarfrist = () => {
           <div className='dropdown mt-2'>
             <button
               onClick={() => toggleDropdown("ledger")}
+              onKeyDown={ (e) =>{
+                if (e.key === "ArrowDown"){
+                  toggleDropdown("ledger");
+                }
+                if( e.key === "ArrowUp"){
+                  toggleDropdown("modifybill");
+                }
+              }}
               className='btn text-white w-100 text-start d-flex align-items-center gap-2'
               ref={(el) => (navLinksRef.current[14] = el)}
             >
@@ -294,6 +325,11 @@ const Navbarfrist = () => {
               ref={(el) => (navLinksRef.current[17] = el)}
               style={navLinkStyle("/outstanding")}
               onClick={closeSidebar}
+              onKeyDown={(e)=>{
+                if(e.key === "ArrowUp"){
+                  toggleDropdown("ledger")
+                }
+              }}
             >
               <FiLayers /> Outstanding
             </Link>
@@ -302,6 +338,11 @@ const Navbarfrist = () => {
           <div className='dropdown mt-2'>
             <button
               onClick={() => toggleDropdown("stockstatus")}
+              onKeyDown={ (e) =>{
+                if (e.key === "ArrowDown"){
+                  toggleDropdown("stockstatus");
+                }
+              }}
               className='btn text-white w-100 text-start d-flex align-items-center gap-2'
               ref={(el) => (navLinksRef.current[18] = el)}
             >
@@ -312,6 +353,14 @@ const Navbarfrist = () => {
           <div className='dropdown mt-2'>
             <button
               onClick={() => toggleDropdown("stocksale")}
+              onKeyDown={(e) => {
+                if (e.key === "ArrowDown"){
+                  toggleDropdown('stocksale')
+                }
+                if( e.key === "ArrowUp"){
+                  toggleDropdown("stockstatus");
+                }
+              }}
               className='btn text-white w-100 text-start d-flex align-items-center gap-2'
               ref={(el) => (navLinksRef.current[19] = el)}
             >
@@ -322,6 +371,15 @@ const Navbarfrist = () => {
           <div className='dropdown mt-2'>
             <button
               onClick={() => toggleDropdown("dispatch")}
+              onKeyDown={(e) => {
+               if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+                  setOpenDropdown("dispatch");
+               }
+               if( e.key === "ArrowUp"){
+                  toggleDropdown("stocksale");
+                }
+              }}
+
               className='btn text-white w-100 text-start d-flex align-items-center gap-2'
               ref={(el) => (navLinksRef.current[20] = el)}
             >
@@ -342,6 +400,11 @@ const Navbarfrist = () => {
           <div className='dropdown mt-2'>
             <button
               onClick={() => toggleDropdown("billing")}
+              onKeyDown={(e) => {
+                if (e.key === "ArrowDown"){
+                  toggleDropdown('billing')
+                }
+              }}
               className='btn text-white w-100 text-start d-flex align-items-center gap-2'
               ref={(el) => (navLinksRef.current[22] = el)}
             >
@@ -352,6 +415,14 @@ const Navbarfrist = () => {
           <div className='dropdown mt-2'>
             <button
               onClick={() => toggleDropdown("report")}
+              onKeyDown={(e) => {
+                if (e.key === "Arrowdown"){
+                  setOpenDropdown("report");
+                }
+                if( e.key === "ArrowUp"){
+                  toggleDropdown("billing");
+                }
+              }}
               className='btn text-white w-100 text-start d-flex align-items-center gap-2'
               ref={(el) => (navLinksRef.current[23] = el)}
             >

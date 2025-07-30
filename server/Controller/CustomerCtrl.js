@@ -67,17 +67,46 @@ exports.deleteCustomer = async (req, res) => {
   }
 };
 
+
 exports.getAllBeats = async (req, res) => {
   try {
     const beats = await Customer.aggregate([
       {
+
+        $match: {
+          area: { $exists: true, $ne: null }, // area null नहीं होनी चाहिए
+        },
+      },
+      {
+        $group: {
+          area: "$area", // ✅ unique area name
+          _id: { $first: "$area._id" }, // ✅ उस name की कोई एक ID
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          areaName: "$_id",
+          areaId: 1,
+        },
+      },
+    ]);
+
+    res.json({
+      message: "Beats fetched successfully",
+      count: beats.length,
+      beats,
+    });
+
         $group: {
           _id: "$area",
         },
       },
     ]);
     res.json(beats);
+
   } catch (err) {
+    console.error("getAllBeats error:", err);
     res.status(500).json({ error: err.message });
   }
 };

@@ -80,6 +80,7 @@ const CustomerBilling = ({
     onDataChange({
       ...formData,
       salesmanName: selectedSalesman?.name || "",
+      beatName: selectedBeat?.area || "", // ✅ Add this
       customerName: selectedCustomer?.ledger || "",
     });
   }, [formData, selectedSalesman, selectedCustomer]);
@@ -159,9 +160,12 @@ const CustomerBilling = ({
 
     setSelectedCustomer(null);
 
+    console.log(selectedBeat, "Selected Bill");
+
     setFormData((prev) => ({
       ...prev,
       selectedBeatId: selectedBeat?._id || null,
+      selectedBeatName: selectedBeat?.area || "",
       selectedCustomerId: null,
     }));
   }, [selectedBeat, allCustomers]);

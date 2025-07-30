@@ -7,6 +7,8 @@ router.get("/", BillingCtrl.getAllInvoices);
 
 router.post("/adjust", BillingCtrl.adjustNewRef);
 router.post("/new", BillingCtrl.applyNewRef);
+router.get("/by-beat", BillingCtrl.getInvoicesByBeat);
+router.get("/by-salesman/:salesmanId", BillingCtrl.getInvoicesBySalesman);
 
 router.get("/by-salesman/:salesmanId", BillingCtrl.getInvoicesBySalesman);
 

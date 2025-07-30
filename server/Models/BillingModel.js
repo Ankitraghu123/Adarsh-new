@@ -22,6 +22,7 @@ const CustomerInfoSchema = new mongoose.Schema({
   paymentMode: String,
   salesmanName: String,
   selectedBeatId: { type: mongoose.Schema.Types.ObjectId, ref: "Beat" },
+  selectedBeatName: String,
   selectedCustomerId: { type: mongoose.Schema.Types.ObjectId, ref: "Customer" },
   selectedSalesmanId: { type: mongoose.Schema.Types.ObjectId, ref: "Salesman" },
   billingType: String,

@@ -1,4 +1,3 @@
-// src/redux/invoice/invoiceSlice.js
 import { createSlice } from "@reduxjs/toolkit";
 import {
   createInvoice,
@@ -8,10 +7,12 @@ import {
   fetchInvoicesByCustomer,
   fetchBalanceByCustomer,
   fetchInvoicesBySalesman,
+  fetchInvoicesByBeat, // ✅ sb branch wala
 } from "./invoiceThunks";
 
 const initialState = {
   invoices: [],
+  areaWise: [], // ✅ sb branch ka areaWise
   currentInvoice: null,
   invoicesByCustomer: [],
   invoicesBySalesman: [],
@@ -34,6 +35,20 @@ const invoiceSlice = createSlice({
   extraReducers: (builder) => {
     builder
 
+      // ✅ sb branch ➡️ Beat invoices
+      .addCase(fetchInvoicesByBeat.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchInvoicesByBeat.fulfilled, (state, action) => {
+        state.loading = false;
+        state.areaWise = action.payload || [];
+      })
+      .addCase(fetchInvoicesByBeat.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload?.error || action.error.message;
+      })
+
       // ✅ Invoices by Salesman
       .addCase(fetchInvoicesBySalesman.pending, (state) => {
         state.loading = true;
@@ -48,7 +63,7 @@ const invoiceSlice = createSlice({
         state.error = action.payload;
       })
 
-      // ✅ Invoices
+      // ✅ Invoices by Customer
       .addCase(fetchInvoicesByCustomer.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -62,20 +77,21 @@ const invoiceSlice = createSlice({
         state.error = action.payload;
       })
 
-      // ✅ Balance
+      // ✅ Balance by Customer
       .addCase(fetchBalanceByCustomer.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(fetchBalanceByCustomer.fulfilled, (state, action) => {
         state.loading = false;
-        state.balanceByCustomer = action.payload.balance; // ✅
+        state.balanceByCustomer = action.payload.balance;
       })
       .addCase(fetchBalanceByCustomer.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
-      // ➕ Create
+
+      // ➕ Create Invoice
       .addCase(createInvoice.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -89,7 +105,7 @@ const invoiceSlice = createSlice({
         state.error = action.payload;
       })
 
-      // 📥 Fetch all
+      // 📥 Fetch All Invoices
       .addCase(fetchInvoices.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -103,7 +119,7 @@ const invoiceSlice = createSlice({
         state.error = action.payload;
       })
 
-      // 📄 Fetch by ID
+      // 📄 Fetch Single Invoice
       .addCase(fetchInvoiceById.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -117,7 +133,7 @@ const invoiceSlice = createSlice({
         state.error = action.payload;
       })
 
-      // 🗑️ Delete
+      // 🗑️ Delete Invoice
       .addCase(deleteInvoice.pending, (state) => {
         state.loading = true;
         state.error = null;

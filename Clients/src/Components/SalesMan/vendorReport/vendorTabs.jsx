@@ -26,6 +26,9 @@ const VendorTabs = () => {
   const [editId, setEditId] = useState(null);
   const [loading, setLoading] = useState(false);
 
+  const formTabRef = useRef(null);
+  const listTabRef = useRef(null);
+
   const inputRefs = useRef([]);
 
   const fetchVendors = async () => {
@@ -43,6 +46,15 @@ const VendorTabs = () => {
   useEffect(() => {
     fetchVendors();
   }, []);
+
+  useEffect(() => {
+    // Set focus on the active tab header when the component mounts or when the tab changes
+    if (key === "form" && formTabRef.current) {
+      formTabRef.current.focus();
+    } else if (key === "list" && listTabRef.current) {
+      listTabRef.current.focus();
+    }
+  }, [key]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -115,7 +127,6 @@ const VendorTabs = () => {
       }
     };
 
-    // Check if cursor is at start of input
     const isAtStart = () => {
       try {
         return input.selectionStart === 0;
@@ -124,7 +135,6 @@ const VendorTabs = () => {
       }
     };
 
-    // Check if cursor is at end of input
     const isAtEnd = () => {
       try {
         return input.selectionStart === input.value.length;
@@ -133,7 +143,6 @@ const VendorTabs = () => {
       }
     };
 
-    // Keyboard navigation logic
     switch (e.key) {
       case "Enter":
         e.preventDefault();
@@ -169,14 +178,13 @@ const VendorTabs = () => {
         }
         break;
 
+      case "F10":
+        e.preventDefault();
+        handleSubmit(e);
+        break;
+
       default:
         break;
-    }
-
-    // Ctrl + Enter for Submit
-    if (e.key === "F10") {
-      e.preventDefault();
-      handleSubmit(e);
     }
   };
 
@@ -190,7 +198,19 @@ const VendorTabs = () => {
         justify
         className='mb-3'
       >
-        <Tab eventKey='form' title={editId ? "Edit Vendor" : "Add Vendor"}>
+        <Tab
+          eventKey='form'
+          title={
+            <span
+              ref={formTabRef}
+              tabIndex={0}
+              className="tab-title"
+              aria-controls="form-tab-panel"
+            >
+              {editId ? "Edit Vendor" : "Add Vendor"}
+            </span>
+          }
+        >
           <VendorForm
             vendor={vendor}
             setVendor={setVendor}
@@ -200,7 +220,19 @@ const VendorTabs = () => {
             handleKeyDown={handleKeyDown}
           />
         </Tab>
-        <Tab eventKey='list' title='Vendor List'>
+        <Tab
+          eventKey='list'
+          title={
+            <span
+              ref={listTabRef}
+              tabIndex={0}
+              className="tab-title"
+              aria-controls="list-tab-panel"
+            >
+              Vendor List
+            </span>
+          }
+        >
           <VendorList
             vendorList={vendorList}
             handleEdit={handleEdit}

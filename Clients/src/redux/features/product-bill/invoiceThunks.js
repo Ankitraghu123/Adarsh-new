@@ -116,3 +116,27 @@ export const fetchInvoicesBySalesman = createAsyncThunk(
     }
   }
 );
+
+
+// ✅ Get invoices by Beat (Area)
+export const fetchInvoicesByBeat = createAsyncThunk(
+  "invoice/fetchInvoicesByBeat",
+  async ({ beatId, beatName }, { rejectWithValue }) => {
+    try {
+      const response = await axios.get(
+        `${API_URL}/by-beat?beatId=${beatId}&beatName=${encodeURIComponent(
+          beatName
+        )}`
+      );
+
+      console.log(response.data, "thunk");
+      return response.data; // backend returns { invoices: [...] }
+    } catch (error) {
+      console.error("[fetchInvoicesByBeat] Error:", error);
+      return rejectWithValue(
+        error.response?.data?.message || error.message || "Something went wrong"
+      );
+    }
+  }
+);
+
