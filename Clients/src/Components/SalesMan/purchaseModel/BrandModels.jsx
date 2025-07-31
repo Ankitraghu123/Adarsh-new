@@ -13,9 +13,26 @@ const BrandModels = ({
   filteredItems,
   setPurchaseData,
   brandRef,
+  partyNoRef,
 }) => {
   if (!showModal) return null;
 
+  const handleBrandSelect = (brand) => {
+    setPurchaseData((prev) => ({
+      ...prev,
+      companyId: brand._id,
+      item: {
+        ...prev.item,
+        companyId: brand._id,
+      },
+    }));
+    setShowModal(false);
+
+    // Change this to focus partyNo instead of brandRef
+    setTimeout(() => {
+      partyNoRef.current?.focus();
+    }, 100);
+  };
   return (
     <div
       className='modal-overlay'
@@ -57,19 +74,20 @@ const BrandModels = ({
           }
           if (e.key === "Enter" && focusedIndex >= 0) {
             e.preventDefault();
-            const selected = filteredItems[focusedIndex];
-            setPurchaseData((prev) => ({
-              ...prev,
-              companyId: selected._id,
-              item: {
-                ...prev.item,
-                companyId: selected._id,
-              },
-            }));
-            setShowModal(false);
-            setTimeout(() => {
-              brandRef.current?.focus();
-            }, 100);
+            handleBrandSelect(filteredItems[focusedIndex]);
+            // const selected = filteredItems[focusedIndex];
+            // setPurchaseData((prev) => ({
+            //   ...prev,
+            //   companyId: selected._id,
+            //   item: {
+            //     ...prev.item,
+            //     companyId: selected._id,
+            //   },
+            // }));
+            // setShowModal(false);
+            // setTimeout(() => {
+            //   brandRef.current?.focus();
+            // }, 100);
           }
           if (e.key === "Escape") {
             e.preventDefault();
